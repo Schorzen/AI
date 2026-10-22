@@ -79,7 +79,7 @@ dialog input,dialog select{width:100%;background:var(--bg);border:1px solid var(
 <main id="log"></main>
 <footer>
   <div class="row">
-    <textarea id="in" rows="1" placeholder="Describe the code, paste an error, or ask for a review"></textarea>
+    <textarea id="in" rows="1" placeholder="Ask for code or paste an error"></textarea>
     <button class="send" id="send">Send</button>
   </div>
 </footer>
@@ -118,7 +118,7 @@ const store={
   get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
   set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 };
-let cfg=store.get('cb.cfg',{base:'http://localhost:3001/v1',key:'',model:'auto'});
+let cfg=store.get('cb.cfg',{base:'https://api.groq.com/openai/v1',key:'',model:'llama-3.3-70b-versatile'});
 let mode=store.get('cb.mode','Write');
 let msgs=store.get('cb.msgs',[]);
 let ctrl=null;
@@ -167,6 +167,7 @@ log.onclick=e=>{
 async function send(){
   if(ctrl){ctrl.abort();return}
   const text=inp.value.trim();if(!text)return;
+  if(!cfg.key&&!/localhost|127\.0\.0\.1/.test(cfg.base)){$('#cfg').click();return}
   inp.value='';inp.style.height='auto';
   msgs.push({role:'user',content:text});
   const ai={role:'assistant',content:''};
