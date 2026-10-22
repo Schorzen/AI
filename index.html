@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Codebench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#eef1f6; --panel:#ffffff; --ink:#18202f; --muted:#5d6778; --line:#d5dbe6;
+  --accent:#2a45e8; --accent-ink:#ffffff; --user:#dfe5fb; --code-bg:#121a2c; --code-ink:#dbe4f7; --code-head:#1b2540;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0e131d; --panel:#151c2a; --ink:#e4e9f4; --muted:#93a0b8; --line:#273148; --accent:#7f94ff; --accent-ink:#0e131d; --user:#1f2a4a; --code-bg:#0a0f19; --code-head:#131b2d}
+}
+*{box-sizing:border-box}
+:root{--col:760px;--g:16px;--r:12px;--gx:max(var(--g),calc((100% - var(--col))/2))}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 var(--sans);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+header{display:flex;align-items:center;gap:10px;min-height:60px;padding:10px var(--gx);border-bottom:1px solid var(--line);background:var(--panel)}
+header h1{font-size:18px;font-weight:600;margin:0 auto 0 0;letter-spacing:-.01em}
+.ghost{background:none;border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:14px;line-height:1.2}
+.ghost:hover{border-color:var(--accent)}
+.modes{display:flex;gap:8px;padding:12px var(--gx);overflow-x:auto;border-bottom:1px solid var(--line);scrollbar-width:none}
+.modes::-webkit-scrollbar{display:none}
+.modes button{background:none;border:1px solid var(--line);border-radius:999px;padding:7px 16px;font-size:14px;line-height:1.2;white-space:nowrap}
+.modes button[aria-pressed=true]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+main{flex:1;overflow-y:auto;padding:28px var(--gx) 36px;display:flex;flex-direction:column;gap:28px}
+.msg{width:100%}
+.msg .who{font-size:13px;font-weight:500;color:var(--muted);margin-bottom:8px}
+.msg.user .body{background:var(--user);border-radius:var(--r);padding:14px 18px;white-space:pre-wrap}
+.msg.ai .body{padding:0 2px}
+.body>:first-child{margin-top:0}
+.body>:last-child{margin-bottom:0}
+.body p{margin:0 0 1em}
+.body h4{margin:1.4em 0 .5em;font-size:16px;font-weight:600}
+.body ul{margin:0 0 1em;padding-left:1.4em}
+.body li{margin:.3em 0}
+.body code{font-family:var(--mono);font-size:.88em;background:var(--line);padding:2px 6px;border-radius:5px}
+.code{margin:16px 0 20px;border-radius:var(--r);overflow:hidden;background:var(--code-bg)}
+.code .ch{display:flex;justify-content:space-between;align-items:center;background:var(--code-head);color:#9fb0d3;font:12px var(--mono);padding:8px 14px}
+.code .ch button{background:none;border:0;color:inherit;font:inherit;padding:4px 6px;border-radius:6px}
+.code .ch button:hover{color:#fff}
+.code pre{margin:0;padding:16px 16px 18px;overflow-x:auto;color:var(--code-ink)}
+.code code{background:none;padding:0;font:13px/1.65 var(--mono);color:inherit}
+.meta{font-size:12px;color:var(--muted);margin-top:10px}
+.err{color:#c0392b}
+@media (prefers-color-scheme:dark){.err{color:#ff8f80}}
+.empty{margin:auto;text-align:center;color:var(--muted);max-width:420px;padding:24px 8px}
+.empty b{display:block;color:var(--ink);font-size:22px;line-height:1.3;margin-bottom:12px;font-weight:600}
+footer{padding:16px var(--gx) calc(16px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);background:var(--panel)}
+.row{display:flex;gap:12px;align-items:flex-end}
+textarea{flex:1;resize:none;max-height:180px;min-height:50px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:13px 16px;line-height:1.45}
+.send{background:var(--accent);color:var(--accent-ink);border:0;border-radius:var(--r);padding:0 22px;height:50px;font-weight:600}
+dialog{background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:16px;width:min(460px,92vw);padding:24px}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog h2{margin:0 0 8px;font-size:19px}
+label{display:block;font-size:14px;margin:18px 0 6px;color:var(--muted)}
+dialog input,dialog select{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:11px 12px}
+.hint{font-size:13px;line-height:1.55;color:var(--muted);margin:18px 0 0}
+.dlg-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:24px}
+@media (max-width:520px){main{gap:24px;padding-top:22px}.send{padding:0 18px}.row{gap:10px}}
+@media (prefers-reduced-motion:no-preference){main{scroll-behavior:smooth}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Codebench</h1>
+  <button class="ghost" id="new">New chat</button>
+  <button class="ghost" id="cfg">Settings</button>
+</header>
+<nav class="modes" id="modes" aria-label="Mode"></nav>
+<main id="log"></main>
+<footer>
+  <div class="row">
+    <textarea id="in" rows="1" placeholder="Describe the code, paste an error, or ask for a review"></textarea>
+    <button class="send" id="send">Send</button>
+  </div>
+</footer>
+
+<dialog id="dlg">
+  <h2>Connection</h2>
+  <label for="preset">Provider</label>
+  <select id="preset">
+    <option value="http://localhost:3001/v1">FreeLLMAPI (running locally)</option>
+    <option value="https://openrouter.ai/api/v1">OpenRouter</option>
+    <option value="https://api.groq.com/openai/v1">Groq</option>
+    <option value="https://api.cerebras.ai/v1">Cerebras</option>
+    <option value="">Custom URL</option>
+  </select>
+  <label for="base">Base URL</label>
+  <input id="base" autocomplete="off" spellcheck="false">
+  <label for="key">API key</label>
+  <input id="key" type="password" autocomplete="off" spellcheck="false" placeholder="freellmapi-… or provider key">
+  <label for="model">Model</label>
+  <input id="model" autocomplete="off" spellcheck="false" placeholder="auto">
+  <p class="hint">Settings and chats stay in this browser only. With FreeLLMAPI use model <code>auto</code> and the unified key from its Keys page.</p>
+  <div class="dlg-actions">
+    <button class="ghost" id="cancel">Cancel</button>
+    <button class="send" id="save" style="height:44px">Save</button>
+  </div>
+</dialog>
+
+<script>
+const MODES={
+  Write:"You are an expert pair programmer. Write correct, idiomatic, minimal code. State assumptions in one or two lines, then give code in fenced blocks with language tags. No filler.",
+  Debug:"You are a debugging specialist. Identify the root cause first, then show the fix as a corrected snippet. Ask for missing information only when it is essential.",
+  Explain:"You are a patient senior engineer. Explain code and concepts clearly, from the big picture down to the details, using short examples.",
+  Review:"You are a strict code reviewer. List real bugs first, then security, performance, and readability issues, ordered by severity. Suggest concrete fixes."
+};
+const store={
+  get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+let cfg=store.get('cb.cfg',{base:'http://localhost:3001/v1',key:'',model:'auto'});
+let mode=store.get('cb.mode','Write');
+let msgs=store.get('cb.msgs',[]);
+let ctrl=null;
+const $=s=>document.querySelector(s);
+const log=$('#log'),inp=$('#in'),sendBtn=$('#send');
+
+function esc(s){return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+function md(t){
+  return t.split('```').map((p,i)=>{
+    if(i%2){
+      const nl=p.indexOf('\n');
+      const lang=nl>=0?p.slice(0,nl).trim():'';
+      const code=nl>=0?p.slice(nl+1):'';
+      return `<div class="code"><div class="ch"><span>${esc(lang)||'code'}</span><button data-copy>Copy</button></div><pre><code>${esc(code.replace(/\n$/,''))}</code></pre></div>`;
+    }
+    let h=esc(p).replace(/`([^`\n]+)`/g,'<code>$1</code>').replace(/\*\*([^*\n]+)\*\*/g,'<strong>$1</strong>');
+    h=h.replace(/^#{1,4} (.+)$/gm,'\n\n<h4>$1</h4>\n\n');
+    h=h.replace(/(^|\n)((?:[-*] .+(?:\n|$))+)/g,(m,a,b)=>a+'\n\n<ul>'+b.trim().split('\n').map(l=>'<li>'+l.slice(2)+'</li>').join('')+'</ul>\n\n');
+    return h.split(/\n{2,}/).map(x=>x.trim()).filter(Boolean).map(x=>/^<(h4|ul)/.test(x)?x:'<p>'+x.replace(/\n/g,'<br>')+'</p>').join('');
+  }).join('');
+}
+
+function render(){
+  if(!msgs.length){
+    log.innerHTML='<div class="empty"><b>What are we building?</b>Ask for code, paste an error, or drop in a function to review. Open Settings to connect a provider.</div>';
+    return;
+  }
+  log.innerHTML=msgs.map(m=>{
+    const u=m.role==='user';
+    return `<div class="msg ${u?'user':'ai'}"><div class="who">${u?'You':'Assistant'}</div><div class="body">${u?esc(m.content):(m.error?`<span class="err">${esc(m.content)}</span>`:md(m.content))}</div>${m.meta?`<div class="meta">${esc(m.meta)}</div>`:''}</div>`;
+  }).join('');
+  log.scrollTop=log.scrollHeight;
+}
+
+function drawModes(){
+  $('#modes').innerHTML=Object.keys(MODES).map(k=>`<button aria-pressed="${k===mode}" data-mode="${k}">${k}</button>`).join('');
+}
+$('#modes').onclick=e=>{const b=e.target.closest('[data-mode]');if(!b)return;mode=b.dataset.mode;store.set('cb.mode',mode);drawModes()};
+
+log.onclick=e=>{
+  const b=e.target.closest('[data-copy]');if(!b)return;
+  const txt=b.closest('.code').querySelector('code').textContent;
+  navigator.clipboard.writeText(txt).then(()=>{b.textContent='Copied';setTimeout(()=>b.textContent='Copy',1200)});
+};
+
+async function send(){
+  if(ctrl){ctrl.abort();return}
+  const text=inp.value.trim();if(!text)return;
+  inp.value='';inp.style.height='auto';
+  msgs.push({role:'user',content:text});
+  const ai={role:'assistant',content:''};
+  msgs.push(ai);render();
+  ctrl=new AbortController();sendBtn.textContent='Stop';
+  const history=msgs.slice(0,-1).filter(m=>!m.error).map(({role,content})=>({role,content}));
+  try{
+    const base=cfg.base.replace(/\/+$/,'');
+    const headers={'Content-Type':'application/json'};
+    if(cfg.key)headers.Authorization='Bearer '+cfg.key;
+    const r=await fetch(base+'/chat/completions',{method:'POST',headers,signal:ctrl.signal,
+      body:JSON.stringify({model:cfg.model||'auto',stream:true,messages:[{role:'system',content:MODES[mode]},...history]})});
+    if(!r.ok){throw new Error(`${r.status} ${r.statusText}: ${(await r.text()).slice(0,300)}`)}
+    const routed=r.headers.get('x-routed-via');if(routed)ai.meta='Served by '+routed;
+    const rd=r.body.getReader(),dec=new TextDecoder();let buf='';
+    for(;;){
+      const {done,value}=await rd.read();if(done)break;
+      buf+=dec.decode(value,{stream:true});
+      const lines=buf.split('\n');buf=lines.pop();
+      for(const l of lines){
+        if(!l.startsWith('data:'))continue;
+        const d=l.slice(5).trim();if(!d||d==='[DONE]')continue;
+        try{ai.content+=JSON.parse(d).choices?.[0]?.delta?.content||''}catch(e){}
+      }
+      render();
+    }
+    if(!ai.content)ai.content='(empty response)';
+  }catch(e){
+    if(e.name==='AbortError'){ai.content=ai.content||'(stopped)'}
+    else{
+      ai.error=true;
+      ai.content=`Request failed: ${e.message}. Check the base URL and key in Settings. If the browser blocked it, the server must allow CORS from this site (and a local server must be running).`;
+    }
+  }
+  ctrl=null;sendBtn.textContent='Send';
+  store.set('cb.msgs',msgs.slice(-60));render();
+}
+sendBtn.onclick=send;
+inp.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();send()}};
+inp.oninput=()=>{inp.style.height='auto';inp.style.height=Math.min(inp.scrollHeight,180)+'px'};
+$('#new').onclick=()=>{if(ctrl)ctrl.abort();msgs=[];store.set('cb.msgs',[]);render()};
+
+const dlg=$('#dlg'),preset=$('#preset');
+function syncPreset(){preset.value=[...preset.options].some(o=>o.value===$('#base').value)?$('#base').value:''}
+$('#cfg').onclick=()=>{$('#base').value=cfg.base;$('#key').value=cfg.key;$('#model').value=cfg.model;syncPreset();dlg.showModal()};
+preset.onchange=()=>{if(preset.value)$('#base').value=preset.value;$('#model').value=preset.value.includes('localhost')?'auto':$('#model').value};
+$('#base').oninput=syncPreset;
+$('#cancel').onclick=()=>dlg.close();
+$('#save').onclick=()=>{cfg={base:$('#base').value.trim(),key:$('#key').value.trim(),model:$('#model').value.trim()||'auto'};store.set('cb.cfg',cfg);dlg.close()};
+
+drawModes();render();
+</script>
+</body>
+</html>
