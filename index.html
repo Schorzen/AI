@@ -26,6 +26,8 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
 #xh:before,#xh:after{content:"";position:absolute;background:var(--o);box-shadow:0 0 4px rgba(0,0,0,.7)}
 #xh:before{left:50%;top:0;width:2px;height:100%;transform:translateX(-50%);-webkit-mask:linear-gradient(#000 30%,transparent 30% 70%,#000 70%);mask:linear-gradient(#000 30%,transparent 30% 70%,#000 70%)}
 #xh:after{top:50%;left:0;height:2px;width:100%;transform:translateY(-50%);-webkit-mask:linear-gradient(90deg,#000 30%,transparent 30% 70%,#000 70%);mask:linear-gradient(90deg,#000 30%,transparent 30% 70%,#000 70%)}
+#xh.lock{width:20px;height:20px}
+#xh.lock:before,#xh.lock:after{background:#ffd9a8;box-shadow:0 0 8px var(--o)}
 #xh.hit:before,#xh.hit:after{background:#fff}
 #xh.head:before,#xh.head:after{background:#ff2d2d}
 #dmg{position:fixed;inset:0;pointer-events:none;opacity:0;background:radial-gradient(ellipse at center,transparent 45%,rgba(255,50,0,.65))}
@@ -125,7 +127,7 @@ function snd(f,d,t,v){try{ac=ac||new(window.AudioContext||window.webkitAudioCont
 
 /* ---------- state ---------- */
 const P={x:0,z:26,y:0,vy:0,yaw:0,pitch:0,hp:100,am:30,rs:90,kills:0,round:0,cd:0,rl:0,rec:0,kick:0,fl:0,dmg:0,pend:false};
-let playing=false,firing=false,lookX=0,lookY=0,jv={x:0,y:0},lid=null,jid=null,jo={x:0,y:0},lp={x:0,y:0};
+let fid=null,playing=false,firing=false,lookX=0,lookY=0,jv={x:0,y:0},lid=null,jid=null,jo={x:0,y:0},lp={x:0,y:0};
 let bots=[],botMeshes=[];const keys={};
 const rc=new THREE.Raycaster(),sparks=[];
 
@@ -196,7 +198,7 @@ function shoot(){
 function reload(){if(!P.rl&&P.am<30&&P.rs>0){P.rl=1.3;snd(300,.12,'square',.04)}}
 
 /* aim assist: gentle pull + slight slowdown near a visible enemy */
-const CONE=6*Math.PI/180;let asB=null,asT=0;
+const CONE=10*Math.PI/180;let asB=null,asT=0;
 const wrap=a=>((a+Math.PI*3)%(Math.PI*2))-Math.PI;
 function aimTo(b){const dx=b.position.x-P.x,dz=b.position.z-P.z,dy=1.35-1.7;
   return{y:Math.atan2(-dx,-dz),p:Math.atan2(dy,Math.hypot(dx,dz))}}
@@ -205,11 +207,12 @@ function assist(dt,active){
   if(asT<=0){asT=.12;asB=null;let best=CONE;
     for(const b of bots){if(b.dead)continue;const a=aimTo(b),ey=wrap(a.y-P.yaw),ep=a.p-P.pitch,e=Math.hypot(ey*Math.cos(P.pitch),ep);
       if(e<best&&los(cam.position,new V(b.position.x,1.35,b.position.z))){best=e;asB=b}}}
-  if(!asB||asB.dead){asB=null;return 1}
+  if(!asB||asB.dead){asB=null;$('xh').classList.remove('lock');return 1}
   const a=aimTo(asB),ey=wrap(a.y-P.yaw),ep=a.p-P.pitch,e=Math.hypot(ey*Math.cos(P.pitch),ep);
-  if(e>CONE*1.3){asB=null;return 1}
-  if(active&&e<CONE*.8){const k=Math.min(1,dt*1.5);P.yaw+=ey*k;P.pitch+=ep*k}
-  return e<CONE*.6?.65:1;
+  if(e>CONE*1.3){asB=null;$('xh').classList.remove('lock');return 1}
+  $('xh').classList.add('lock');
+  if(active){const k=Math.min(1,dt*3.5*(1-e/(CONE*1.3)));P.yaw+=ey*k;P.pitch+=ep*k}
+  return e<CONE*.7?.55:.8;
 }
 
 function step(dt){
@@ -253,7 +256,7 @@ function start(){
   snd(400,.1,'sine',.05);
 }
 function die(){
-  playing=false;firing=false;P.dmg=0;$('dmg').style.opacity=0;
+  playing=false;firing=false;fid=lid=jid=null;jv={x:0,y:0};jb.style.display=jk.style.display='none';P.dmg=0;$('dmg').style.opacity=0;
   if(document.pointerLockElement)document.exitPointerLock();
   $('hud').style.display='none';$('menu').style.display='flex';
   $('msg').textContent='Eliminated in round '+P.round+' with '+P.kills+(P.kills===1?' kill.':' kills.');
@@ -266,11 +269,13 @@ const jb=$('jb'),jk=$('jk');
 addEventListener('touchstart',e=>{
   if(!playing)return;
   for(const t of e.changedTouches){
+    if(t.target.closest&&t.target.closest('#fire')){e.preventDefault();fid=t.identifier;firing=true;
+      if(lid===null){lid=t.identifier;lp={x:t.clientX,y:t.clientY}}continue}
     if(t.target.closest&&t.target.closest('.btn'))continue;
     e.preventDefault();
     if(t.clientX<innerWidth*.45&&jid===null){jid=t.identifier;jo={x:t.clientX,y:t.clientY};
       jb.style.cssText=jk.style.cssText='display:block;left:'+jo.x+'px;top:'+jo.y+'px'}
-    else if(t.clientX>=innerWidth*.45&&lid===null){lid=t.identifier;lp={x:t.clientX,y:t.clientY}}
+    else if(t.clientX>=innerWidth*.45&&(lid===null||lid===fid)){lid=t.identifier;lp={x:t.clientX,y:t.clientY}}
   }},{passive:false});
 addEventListener('touchmove',e=>{
   if(!playing)return;e.preventDefault();
@@ -281,12 +286,14 @@ addEventListener('touchmove',e=>{
   }},{passive:false});
 function tend(e){for(const t of e.changedTouches){
   if(t.identifier===jid){jid=null;jv={x:0,y:0};jb.style.display=jk.style.display='none'}
+  if(t.identifier===fid){fid=null;firing=false}
   if(t.identifier===lid)lid=null}}
 addEventListener('touchend',tend);addEventListener('touchcancel',tend);
 
 const bind=(id,dn,up)=>{const el=$(id);el.addEventListener('pointerdown',e=>{e.preventDefault();dn()});
   if(up)['pointerup','pointercancel','pointerleave'].forEach(n=>el.addEventListener(n,up))};
-bind('fire',()=>firing=true,()=>firing=false);
+$('fire').addEventListener('pointerdown',e=>{if(e.pointerType!=='touch')firing=true});
+['pointerup','pointercancel'].forEach(n=>$('fire').addEventListener(n,e=>{if(e.pointerType!=='touch')firing=false}));
 bind('rel',reload);
 const jump=()=>{if(P.y===0)P.vy=7};bind('jmp',jump);
 
