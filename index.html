@@ -8,7 +8,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2316110d'/><path d='M50 14v26M50 60v26M14 50h26M60 50h26' stroke='%23ff6a00' stroke-width='9' stroke-linecap='round'/></svg>">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,500;0,700;1,700&display=swap">
 <style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 :root{--o:#ff6a00;--o2:#ffb066;--bg:#16110d;--ink:#fff1e3;--chip:rgba(22,17,13,.72)}
 html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:'Chakra Petch',system-ui,-apple-system,sans-serif;touch-action:none}
 canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
@@ -82,10 +82,13 @@ h1{margin:0;font-size:clamp(38px,9vw,88px);line-height:.95;font-style:italic;fon
 #pbar{position:absolute;left:50%;bottom:max(128px,calc(env(safe-area-inset-bottom) + 128px));width:210px;height:10px;transform:translateX(-50%);background:rgba(255,255,255,.2);border-radius:6px;overflow:hidden;display:none}
 #pbar i{display:block;height:100%;width:0;background:var(--o)}
 #flash{position:fixed;inset:0;background:#ffd9a8;opacity:0;pointer-events:none;z-index:3}
+#rot{position:fixed;inset:0;z-index:20;display:none;place-items:center;text-align:center;padding:24px;background:var(--bg);font-weight:700;font-size:22px}
+@media (orientation:portrait){#rot{display:grid}}
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
+<div id="rot">Rotate your phone to landscape</div>
 <div id="dmg"></div><div id="flash"></div><div id="sc"></div><div id="bn"></div>
 <div id="jb"></div><div id="jk"></div>
 <div class="hud" id="hud" style="display:none">
@@ -127,7 +130,9 @@ ren.setPixelRatio(Math.min(devicePixelRatio,1.75));
 const SKY=0x2b1a10,scene=new THREE.Scene();
 scene.background=new THREE.Color(SKY);scene.fog=new THREE.Fog(0x3a2216,30,125);
 const cam=new THREE.PerspectiveCamera(75,1,.1,170);cam.rotation.order='YXZ';scene.add(cam);
-function rsz(){ren.setSize(innerWidth,innerHeight,false);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()}
+let BF=75;const HFOV=100;  /* base vertical FOV, derived from the screen so the horizontal FOV stays about HFOV degrees */
+function rsz(){ren.setSize(innerWidth,innerHeight,false);const a=innerWidth/innerHeight;
+  BF=Math.max(55,Math.min(75,2*Math.atan(Math.tan(HFOV*Math.PI/360)/a)*180/Math.PI));cam.fov=BF;cam.aspect=a;cam.updateProjectionMatrix()}
 addEventListener('resize',rsz);rsz();
 scene.add(new THREE.HemisphereLight(0xffd2a8,0x2a1a10,.95));
 const sun=new THREE.DirectionalLight(0xffa860,.8);sun.position.set(20,40,10);scene.add(sun);
@@ -272,10 +277,16 @@ const GB={
   bx(g,.06,.07,.1,mMt,0,-.08,0);guard(g,-.06,.12,.12,mDk);bx(g,.075,.14,.36,mDk,0,-.03,.45,-.06);bx(g,.07,.035,.2,go,0,.045,.43,-.06);
   bx(g,.078,.15,.02,mDk,0,-.04,.64);bx(g,.06,.14,.075,mDk,0,-.12,.15,.3)})};
 const MZ={pistol:-.27,hc:-.4,smg:-.69,rifle:-.83,sniper:-1.16};
-function showGun(k){for(const n in GB)GB[n].visible=n===k;fl.position.z=MZ[k]}
+function showGun(k){for(const n in GB)GB[n].visible=n===k;fl.position.z=MZ[k];const h=HG[k];hgR.position.set(h.r[0],h.r[1],h.r[2]);hgL.position.set(h.l[0],h.l[1],h.l[2])}
 const hands=new THREE.Group();gun.add(hands);
-bx(hands,.11,.11,.15,gs,0,-.12,.12);bx(hands,.1,.1,.12,gs,0,-.06,-.3);
-bx(hands,.12,.12,.55,go,.04,-.2,.5,-.3);bx(hands,.1,.1,.6,gm,-.16,-.17,.12,-.1,.35);
+/* first-person hands: a glove on the grip plus a sleeve running off the bottom of the screen.
+   (The cloned 3D soldier arms looked cut open, so they are off. Set FP_ARMS=true to try them again.) */
+const FP_ARMS=false;
+const HG={pistol:{r:[0,-.1,.09],l:[-.035,-.1,.03]},hc:{r:[0,-.12,.1],l:[-.035,-.12,.05]},smg:{r:[0,-.115,.12],l:[0,-.085,-.2]},
+  rifle:{r:[0,-.12,.17],l:[0,-.09,-.3]},sniper:{r:[0,-.12,.15],l:[0,-.09,-.28]}};
+const hgR=new THREE.Group(),hgL=new THREE.Group();hands.add(hgR,hgL);
+bx(hgR,.075,.1,.09,gs,0,0,0,.2);bx(hgR,.07,.07,.5,go,.012,-.12,.27,.45);
+bx(hgL,.085,.075,.12,gs,0,0,0);bx(hgL,.07,.07,.55,go,-.096,-.106,.29,.35,-.3);
 gun.add(gb);gun.position.set(.22,-.2,-.45);cam.add(gun);
 
 /* ---------- audio ---------- */
@@ -424,7 +435,7 @@ function hurtP(dmg){
   if(!P.alive)return;
   if(P.ar>0){dmg*=.6;P.ar=Math.max(0,P.ar-dmg)}
   P.hp-=dmg;P.dmg=.7;snd(120,.15,'square',.1);
-  if(P.hp<=0){P.alive=false;firing=false;gun.visible=false;banner('You died')}
+  if(P.hp<=0){P.alive=false;firing=false;gun.visible=false;if(G.ph==='live')banner('You died')}
 }
 function los(from,to){const d=to.clone().sub(from),l=d.length();rc.set(from,d.normalize());rc.far=l;return rc.intersectObjects(solids).length===0}
 function mv(b,vx,vz){let m=false;
@@ -519,7 +530,7 @@ function shoot(){
   const dir=new V(0,0,-1).applyEuler(cam.rotation);
   dir.x+=(R()-.5)*sp;dir.y+=(R()-.5)*sp;dir.normalize();
   rc.set(cam.position,dir);rc.far=80;
-  const h=rc.intersectObjects(solids.concat(botMeshes))[0];
+  const h=rc.intersectObjects(solids.concat(botMeshes)).find(x=>{const u=x.object.userData;return !(u.bot&&!u.bot.team)});  /* bullets pass through your own squad */
   if(h){const u=h.object.userData;
     if(u.bot){const b=u.bot;if(b.team&&!b.dead){hurtBot(b,W.d*(u.head?2.5:1),true);mark(u.head);snd(u.head?1300:900,.06,'sine',.08)}}
     else spark(h.point);}
@@ -588,7 +599,7 @@ function endRound(win,msg){
   banner(msg||(win?'Round won':'Round lost'));
 }
 function start(){
-  Object.assign(P,{kills:0,money:800,ar:0,alive:true,lock:false});fpInit();equip('pistol');
+  Object.assign(P,{kills:0,money:800,ar:0,alive:true,lock:false});if(FP_ARMS)fpInit();equip('pistol');
   Object.assign(G,{round:1,s:[0,0],M:[800,800],L:[0,0]});
   $('menu').style.display='none';$('hud').style.display='block';playing=true;startRound();
   try{document.documentElement.requestFullscreen?.().catch(()=>{})}catch(e){}
@@ -597,7 +608,7 @@ function start(){
 }
 function finish(){
   playing=false;firing=false;fid=lid=jid=null;jv={x:0,y:0};jb.style.display=jk.style.display='none';
-  document.exitPointerLock?.();closeShop();$('dmg').style.opacity=0;$('sc').style.opacity=0;cam.fov=75;cam.updateProjectionMatrix();
+  document.exitPointerLock?.();closeShop();$('dmg').style.opacity=0;$('sc').style.opacity=0;cam.fov=BF;cam.updateProjectionMatrix();
   $('hud').style.display='none';$('menu').style.display='flex';gun.visible=true;
   const a=G.s[0],e=G.s[1];
   $('msg').textContent=(a>e?'Victory':a<e?'Defeat':'Draw')+', '+a+' to '+e+'. You finished with '+P.kills+' kills.';
@@ -610,7 +621,7 @@ function step(dt){
   if(fr&&G.t<=0)goLive();
   if(G.ph==='end'&&G.t<=0){if(G.round>=10){finish();return}G.round++;startRound()}
   const slow=act?assist(dt,firing||lid!==null):1;
-  const sens=cam.fov/75;P.yaw-=lookX*.0045*slow*sens;P.pitch-=lookY*.0045*slow*sens;lookX=lookY=0;
+  const sens=cam.fov/BF;P.yaw-=lookX*.0045*slow*sens;P.pitch-=lookY*.0045*slow*sens;lookX=lookY=0;
   P.pitch=Math.max(-1.4,Math.min(1.4,P.pitch));
   if(act){
     let mx=jv.x+(keys.KeyD?1:0)-(keys.KeyA?1:0),mz=jv.y+(keys.KeyW?1:0)-(keys.KeyS?1:0);
@@ -637,11 +648,11 @@ function step(dt){
   }
   if(asB)asB.vis=1;
   P.kick*=.8;P.fl-=dt;fl.visible=P.fl>0&&P.alive;P.zm+=((P.ads&&P.alive&&!P.rl?1:0)-P.zm)*Math.min(1,dt*12);
-  const fv=75+(ZF[P.wk]-75)*P.zm;if(Math.abs(cam.fov-fv)>.05){cam.fov=fv;cam.updateProjectionMatrix()}
+  const fv=BF*(1+(ZF[P.wk]/75-1)*P.zm);if(Math.abs(cam.fov-fv)>.05){cam.fov=fv;cam.updateProjectionMatrix()}
   let rs=0;if(P.rl>0){const p=1-P.rl/P.rlT;rs=Math.sin(p*Math.PI);if(!P.rc&&p>.5){P.rc=1;snd(220,.05,'square',.06)}gb.position.y=Math.sin(p*26)*.012*rs}else gb.position.y=0;
   const ks=Math.min(1,Math.tan(fv*Math.PI/360)/Math.tan(37.5*Math.PI/180));
   gun.scale.setScalar(ks);hands.visible=!fpArms&&P.zm<.25;
-  gun.position.set(.22*(1-P.zm),-.2*(1-P.zm)+(-TY[P.wk]*ks-.012)*P.zm-.3*rs,-.45+P.kick);gun.rotation.set(.6*rs,0,-.55*rs);
+  gun.position.set(.22*ks*(1-P.zm),-.2*ks*(1-P.zm)+(-TY[P.wk]*ks-.012)*P.zm-.3*ks*rs,-.45+P.kick);gun.rotation.set(.6*rs,0,-.55*rs);
   const scp=P.wk==='sniper'&&P.zm>.85;$('sc').style.opacity=scp?1:0;$('xh').style.visibility=scp?'hidden':'visible';
   gun.visible=P.alive&&!(P.wk==='sniper'&&P.zm>.5);
   P.dmg=Math.max(0,P.dmg-dt*1.2);
@@ -690,7 +701,7 @@ addEventListener('touchstart',e=>{
   for(const t of e.changedTouches){
     if(t.target.closest&&t.target.closest('#fire')){e.preventDefault();fid=t.identifier;firing=true;
       if(lid===null){lid=t.identifier;lp={x:t.clientX,y:t.clientY}}continue}
-    if(t.target.closest&&t.target.closest('.btn,#shop'))continue;
+    if(t.target.closest&&t.target.closest('.btn,#shop,#rot'))continue;
     e.preventDefault();
     if(t.clientX<innerWidth*.45&&jid===null){jid=t.identifier;jo={x:t.clientX,y:t.clientY};
       jb.style.cssText=jk.style.cssText='display:block;left:'+jo.x+'px;top:'+jo.y+'px'}
