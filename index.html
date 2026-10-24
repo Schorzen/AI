@@ -76,7 +76,7 @@ h1{margin:0;font-size:clamp(38px,9vw,88px);line-height:.95;font-style:italic;fon
 #scp.on{background:var(--o);color:#1a0e05;border-color:var(--o2)}
 #obj{top:calc(max(12px,env(safe-area-inset-top)) + 46px);left:50%;transform:translateX(-50%);font-size:13px;white-space:nowrap;border-left:0;border-bottom:3px solid var(--o);font-weight:500;text-align:center}
 #obj.hot{background:rgba(130,24,0,.88);border-color:#ff3d1f;color:#fff}
-#radar{position:absolute;top:calc(max(12px,env(safe-area-inset-top)) + 46px);right:max(16px,env(safe-area-inset-right));width:132px;height:80px;border:2px solid rgba(255,106,0,.6);border-radius:10px}
+#radar{position:absolute;left:auto;bottom:auto;top:calc(max(12px,env(safe-area-inset-top)) + 46px);right:max(16px,env(safe-area-inset-right));width:132px;height:80px;border:2px solid rgba(255,106,0,.6);border-radius:10px}
 #buy{top:calc(max(12px,env(safe-area-inset-top)) + 104px);right:auto;left:max(16px,env(safe-area-inset-left))}
 #plant{left:50%;transform:translateX(-50%);bottom:max(70px,calc(env(safe-area-inset-bottom) + 70px));border-radius:14px;padding:13px 22px;background:var(--o);color:#1a0e05;border-color:var(--o2);font-size:15px;white-space:nowrap;display:none}
 #pbar{position:absolute;left:50%;bottom:max(128px,calc(env(safe-area-inset-bottom) + 128px));width:210px;height:10px;transform:translateX(-50%);background:rgba(255,255,255,.2);border-radius:6px;overflow:hidden;display:none}
@@ -90,7 +90,7 @@ h1{margin:0;font-size:clamp(38px,9vw,88px);line-height:.95;font-style:italic;fon
 <div id="jb"></div><div id="jk"></div>
 <div class="hud" id="hud" style="display:none">
   <div class="chip" id="hp"><b id="hpn">100</b><small>HP</small><b id="arn" style="font-size:14px;margin-left:10px">0</b><small>AR</small><div class="bar"><i id="hpb"></i></div></div>
-  <div class="chip" id="mid"><b id="sc">0 : 0</b><small id="rd"></small><small id="tm"></small><small id="alive"></small></div>
+  <div class="chip" id="mid"><b id="score">0 : 0</b><small id="rd"></small><small id="tm"></small><small id="alive"></small></div>
   <div class="chip" id="ks"><b id="kn">0</b><small>kills</small></div>
   <div class="chip" id="ammo"><small id="wn"></small><b id="am">30</b><small>/ <span id="rs">90</span></small></div>
   <div class="chip" id="obj"></div>
@@ -113,6 +113,7 @@ h1{margin:0;font-size:clamp(38px,9vw,88px);line-height:.95;font-style:italic;fon
   </div>
   <p id="msg">Bomb defusal, 10 rounds. Cross plants the C4 at A or B. Counter defends the sites.</p>
   <button id="go">Play</button>
+  <div id="mstat" style="margin-top:12px;font-size:13px;opacity:.75"></div>
   <div id="help">You are Cross, with 4 teammates. Hold the Plant button inside site A or B to arm the C4 for 3 seconds, then protect it for 40 seconds. Or eliminate all 5 Counter defenders. Round 1 is pistols only. Touch: left thumb moves, right side aims, orange button fires (drag it to aim). Light aim assist helps. Best in landscape.<br>Desktop: WASD, mouse, click to fire, right-click scope, R reload, B buy, E hold to plant, Space jump.</div>
 </div></div>
 
@@ -317,10 +318,13 @@ function prepModel(k,sc){
   MODELS[k]=sc;
 }
 {const go2=$('go');go2.disabled=true;go2.textContent='Loading soldiers...';let n=2,fin=false;
- const done=()=>{if(fin)return;fin=true;go2.disabled=false;go2.textContent='Play'};
+ const done=()=>{if(fin)return;fin=true;go2.disabled=false;go2.textContent='Play';
+   $('mstat').textContent=!THREE.GLTFLoader||!THREE.SkeletonUtils?'3D soldier loader was blocked, using blocky soldiers.':MODELS.cross&&MODELS.counter?'3D soldiers loaded.':MODELS.cross||MODELS.counter?'Only one 3D soldier file was found in the assets folder.':'3D soldier files not found. Upload soldier_cross.glb and soldier_counter.glb next to index.html. Using blocky soldiers for now.'};
  if(!THREE.GLTFLoader||!THREE.SkeletonUtils)done();
  else{const L=new THREE.GLTFLoader();
-  [['cross','assets/soldier_cross.glb'],['counter','assets/soldier_counter.glb']].forEach(a=>L.load(a[1],g=>{try{prepModel(a[0],g.scene)}catch(e){}if(--n===0)done()},undefined,()=>{if(--n===0)done()}));
+  [['cross','soldier_cross.glb'],['counter','soldier_counter.glb']].forEach(a=>{
+    const ok=g=>{try{prepModel(a[0],g.scene)}catch(e){}if(--n===0)done()},fail=()=>{if(--n===0)done()};
+    L.load(a[1],ok,undefined,()=>L.load('assets/'+a[1],ok,undefined,fail))});
   setTimeout(done,20000)}}
 const mHit=new THREE.MeshBasicMaterial({colorWrite:false,depthWrite:false});
 function rigOf(m){
@@ -621,7 +625,7 @@ function hud(){
   $('hpn').textContent=Math.max(0,Math.ceil(P.hp));$('hpb').style.width=Math.max(0,P.hp)+'%';$('arn').textContent=Math.ceil(P.ar);
   $('cash').textContent='$'+P.money;$('kn').textContent=P.kills;
   $('am').textContent=P.rl?'...':P.am;$('rs').textContent=P.rs;$('wn').textContent=wp().n;
-  $('sc').textContent=G.s[0]+' : '+G.s[1];$('rd').textContent='R'+G.round+'/10';
+  $('score').textContent=G.s[0]+' : '+G.s[1];$('rd').textContent='R'+G.round+'/10';
   const t=Math.max(0,Math.ceil(G.t));$('tm').textContent=G.ph==='freeze'?'Buy '+t:G.ph==='live'?(G.bomb.ph==='planted'?'C4 armed':Math.floor(t/60)+':'+String(t%60).padStart(2,'0')):'';
   $('alive').textContent=aa+' v '+ae;
   const B=G.bomb;
