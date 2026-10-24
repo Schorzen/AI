@@ -387,13 +387,13 @@ function ik(a,b,c,l1,l2,T,pole){
   const E2=b.getWorldPosition(new V());aim(b,c,H.sub(E2).normalize());
 }
 /* first-person arms: the Cross soldier's arms and hands, clipped so only the forearms show */
-let fpArms=null,fpRig=null;const FS=1.55,fpPlane=new THREE.Plane(),fpTop=new THREE.Plane(),fpBot=new THREE.Plane(),_fw=new V(),_fq=new V(),_fu=new V();
+let fpArms=null,fpRig=null;const FS=1.75,FPL={pistol:[-.02,-.09,.02],hc:[-.02,-.09,.02],smg:[0,-.03,-.14],rifle:[0,-.04,-.22],sniper:[0,-.04,-.2]},fpPlane=new THREE.Plane(),fpTop=new THREE.Plane(),fpBot=new THREE.Plane(),_fw=new V(),_fq=new V(),_fu=new V();
 function fpInit(){
   if(fpArms||!MODELS.cross)return;
   const m=THREE.SkeletonUtils.clone(MODELS.cross);
   m.traverse(o=>{if(o.isMesh){o.material=o.material.clone();o.material.clippingPlanes=[fpPlane,fpTop,fpBot];o.frustumCulled=false;o.renderOrder=5}});
   fpRig=rigOf(m);fpArms=new THREE.Group();fpArms.add(m);fpArms.rotation.y=Math.PI;fpArms.scale.setScalar(FS);
-  fpArms.position.set(.09,-2.505,-.177);cam.add(fpArms);ren.localClippingEnabled=true;
+  fpArms.position.set(.2,-3.08,-.168);fpRig.bn.LeftHand.scale.setScalar(.62);fpRig.bn.RightHand.scale.setScalar(.62);cam.add(fpArms);ren.localClippingEnabled=true;
 }
 function fpUpdate(){
   if(!fpArms)return;const vis=gun.visible&&P.alive;fpArms.visible=vis;if(!vis)return;
@@ -402,7 +402,7 @@ function fpUpdate(){
   fpTop.setFromNormalAndCoplanarPoint(_fu.clone().negate(),_fq.clone().addScaledVector(_fu,-.06));fpBot.setFromNormalAndCoplanarPoint(_fu,_fq.clone().addScaledVector(_fu,-.62));
   const n=fpRig.bn,r=fpRig.l,c=GUNCFG[P.wk],T=a=>gun.localToWorld(new V(a[0],a[1],a[2])),D=(x,y,z)=>new V(x,y,z).transformDirection(cam.matrixWorld);
   ik(n.RightArm,n.RightForeArm,n.RightHand,r.Arm*FS,r.Fore*FS,T(c.rg),D(.6,-1,.5));
-  ik(n.LeftArm,n.LeftForeArm,n.LeftHand,r.Arm*FS,r.Fore*FS,T(c.lg),D(-.6,-1,.5));
+  ik(n.LeftArm,n.LeftForeArm,n.LeftHand,r.Arm*FS,r.Fore*FS,T(FPL[P.wk]),D(-.6,-1,.5));
 }
 function poseBot(b){
   const r=b.rig,bd=b.body;b.mdl.position.y=-.06-.025*b.amp;b.updateMatrixWorld(true);bd.getWorldQuaternion(_gq);
