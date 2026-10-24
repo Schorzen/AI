@@ -83,12 +83,14 @@ h1{margin:0;font-size:clamp(38px,9vw,88px);line-height:.95;font-style:italic;fon
 #pbar i{display:block;height:100%;width:0;background:var(--o)}
 #flash{position:fixed;inset:0;background:#ffd9a8;opacity:0;pointer-events:none;z-index:3}
 #rot{position:fixed;inset:0;z-index:20;display:none;place-items:center;text-align:center;padding:24px;background:var(--bg);font-weight:700;font-size:22px}
+#rot button{display:block;margin:18px auto 14px;font:inherit;font-weight:700;font-size:20px;color:#1a0e05;background:var(--o);border:0;border-radius:12px;padding:13px 40px}
+#rot small{display:block;font-weight:500;font-size:13px;opacity:.7;max-width:30ch;margin:0 auto}
 @media (orientation:portrait){#rot{display:grid}}
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
-<div id="rot">Rotate your phone to landscape</div>
+<div id="rot"><div>Rotate your phone to landscape<br><button id="rotb">Rotate</button><small>If nothing happens, turn off Rotation Lock and turn the phone sideways.</small></div></div>
 <div id="dmg"></div><div id="flash"></div><div id="sc"></div><div id="bn"></div>
 <div id="jb"></div><div id="jk"></div>
 <div class="hud" id="hud" style="display:none">
@@ -695,6 +697,7 @@ function drawRadar(){
 
 /* ---------- input ---------- */
 $('go').addEventListener('click',start);
+$('rotb').addEventListener('click',async()=>{try{await document.documentElement.requestFullscreen?.()}catch(e){}try{await screen.orientation?.lock?.('landscape')}catch(e){}});
 const jb=$('jb'),jk=$('jk');
 addEventListener('touchstart',e=>{
   if(!playing)return;
