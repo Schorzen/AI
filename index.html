@@ -324,7 +324,46 @@ const gT=BG(.72,.7,.4),gVs=BG(.8,.55,.46),gL=BG(.26,.8,.3),gBt=BG(.28,.15,.4),gA
   gGb=BG(.08,.12,.55),gGm=BG(.06,.2,.08),gGr=BG(.04,.04,.3),gGs=BG(.07,.1,.2);
 /* ---- 3D soldier models (assets/*.glb), blocky soldiers are the fallback ---- */
 const MODELS={};
+const smt=(a,b,x)=>{const t=Math.min(1,Math.max(0,(x-a)/(b-a)));return t*t*(3-2*t)};
+/* fills w[0..12]: 0 Hips, then Left (UpLeg,Leg,Foot,Arm,ForeArm,Hand), then Right */
+function cWeights(x,y,w){
+  w.fill(0);
+  for(let s=0;s<2;s++){const sg=s?-1:1,o=1+s*6,ax=Math.abs(x),
+    lw=smt(-.02,-.22,y)*(1-smt(.30,.36,ax)*smt(-.30,-.20,y))*smt(-.05,.05,x*sg),kn=smt(-.50,-.72,y),an=smt(-.86,-.92,y);
+    w[o]=lw*(1-kn);w[o+1]=lw*kn*(1-an);w[o+2]=lw*kn*an;
+    const ar=x*sg>0&&y>-.30?smt(.22,.33,ax)*smt(.80,.60,y):0,fo=smt(.40,.14,y),ha=smt(.06,-.04,y);
+    w[o+3]=ar*(1-fo);w[o+4]=ar*fo*(1-ha);w[o+5]=ar*fo*ha}
+  let t=0;for(let i=1;i<13;i++)t+=w[i];w[0]=Math.max(0,1-t);
+}
+
+/* ---- the Counter soldier is a static mesh: give it a simple 13-bone skeleton (weights from position) so it can
+   walk and hold its gun with the same IK as your squad. If anything fails it falls back to the old static model. ---- */
+let COUNTER_RIG=false;
+const CJ={UpLeg:[.15,-.12],Leg:[.17,-.62],Foot:[.19,-.93],Arm:[.33,.58],ForeArm:[.41,.27],Hand:[.38,-.02]};  /* joints on the +x side, model space */
+function skinCounter(sc){
+  sc.updateMatrixWorld(true);
+  let src=null;sc.traverse(o=>{if(!src&&o.isMesh)src=o});if(!src)throw 0;
+  const g=src.geometry.clone();g.applyMatrix4(src.matrixWorld);
+  const N=g.attributes.position.count,P=g.attributes.position.array,si=new Uint16Array(N*4),sw=new Float32Array(N*4),w=new Float32Array(13),ord=[0,1,2,3,4,5,6,7,8,9,10,11,12];
+  for(let i=0;i<N;i++){cWeights(P[i*3],P[i*3+1],w);
+    const top=ord.slice().sort((a,b)=>w[b]-w[a]);let t=0;for(let k=0;k<4;k++)t+=w[top[k]];
+    for(let k=0;k<4;k++){si[i*4+k]=top[k];sw[i*4+k]=w[top[k]]/t}}
+  g.applyMatrix4(new THREE.Matrix4().makeScale(.95,.95,.95).premultiply(new THREE.Matrix4().makeTranslation(0,.95,0)));  /* 1.9m tall, feet on y=0 */
+  g.setAttribute('skinIndex',new THREE.Uint16BufferAttribute(si,4));g.setAttribute('skinWeight',new THREE.Float32BufferAttribute(sw,4));
+  const bones=[],wps=new Map(),bp=(x,y)=>new V(x*.95,y*.95+.95,0);
+  const mkb=(name,par,wpos)=>{const b=new THREE.Bone();b.name=name;b.position.copy(wpos);if(par){b.position.sub(wps.get(par));par.add(b)}wps.set(b,wpos);bones.push(b);return b};
+  const hips=mkb('Hips',null,bp(0,0));
+  for(const [s,sg] of [['Left',1],['Right',-1]]){const J=n=>bp(CJ[n][0]*sg,CJ[n][1]);
+    const ul=mkb(s+'UpLeg',hips,J('UpLeg')),lg=mkb(s+'Leg',ul,J('Leg'));mkb(s+'Foot',lg,J('Foot'));
+    const ar=mkb(s+'Arm',hips,J('Arm')),fa=mkb(s+'ForeArm',ar,J('ForeArm'));mkb(s+'Hand',fa,J('Hand'))}
+  (Array.isArray(src.material)?src.material:[src.material]).forEach(m=>{m.skinning=true;m.needsUpdate=true});
+  const mesh=new THREE.SkinnedMesh(g,src.material);mesh.frustumCulled=false;
+  const root=new THREE.Group();root.add(mesh);root.add(hips);root.updateMatrixWorld(true);
+  mesh.bind(new THREE.Skeleton(bones));
+  return root;
+}
 function prepModel(k,sc){
+  if(k==='counter'){try{sc=skinCounter(sc);COUNTER_RIG=true}catch(e){COUNTER_RIG=false}}
   sc.traverse(o=>{if(o.isMesh){o.frustumCulled=false;(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{
     if(m.map){m.map.encoding=THREE.LinearEncoding;m.map.needsUpdate=true}
     m.metalness=.1;m.roughness=.85;if(m.emissive)m.emissive.setRGB(.1,.08,.07);m.color.set(k==='cross'?0xffe0c8:0xc8e4ff)})}});
@@ -365,12 +404,12 @@ function mkBot(x,z,team,wk,ar){
   const src=MODELS[team?'counter':'cross'];
   if(src){
     let rig=null,mdl;
-    if(team){mdl=src.clone(true);mdl.scale.setScalar(.95);mdl.position.y=.95}
+    if(team&&!COUNTER_RIG){mdl=src.clone(true);mdl.scale.setScalar(.95);mdl.position.y=.95}
     else{mdl=THREE.SkeletonUtils.clone(src);rig=rigOf(mdl)}
     body.add(mdl);
     const hy=team?[1.25,.65,1.8,.22,.5,1]:[1.25,.62,1.68,.2,.45,.9];
     part(body,BG(.6,hy[1],.36),mHit,0,hy[0],0);part(body,new THREE.SphereGeometry(hy[3],8,6),mHit,0,hy[2],0,true);part(body,BG(.5,hy[5],.32),mHit,0,hy[4],0);
-    holdGun(g,body,wk,team?1:0);
+    holdGun(g,body,wk,team&&!COUNTER_RIG?1:0);
     Object.assign(g,{rig,mdl,mod:true});
   }else{
     const leg=sx=>{const l=new THREE.Group();l.position.set(sx,.8,0);body.add(l);part(l,gL,mP[team],0,-.4,0);part(l,gBt,mG,0,-.74,.05);return l};
