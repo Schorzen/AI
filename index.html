@@ -40,13 +40,15 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
 #fire:active{background:#ff8a33}
 #rel{width:58px;height:58px;right:calc(max(24px,env(safe-area-inset-right)) + 104px);bottom:max(30px,env(safe-area-inset-bottom));font-size:13px}
 #jmp{width:58px;height:58px;right:calc(max(24px,env(safe-area-inset-right)) + 16px);bottom:calc(max(24px,env(safe-area-inset-bottom)) + 104px);font-size:13px}
+#pick{left:50%;transform:translateX(-50%);bottom:max(124px,calc(env(safe-area-inset-bottom) + 124px));border-radius:14px;padding:12px 20px;background:var(--o);color:#1a0e05;border-color:var(--o2);font-size:15px;white-space:nowrap;display:none}
 #swp{width:58px;height:58px;right:calc(max(24px,env(safe-area-inset-right)) + 192px);bottom:max(30px,env(safe-area-inset-bottom));font-size:13px;display:none}
 #jb,#jk{position:fixed;border-radius:50%;pointer-events:none;display:none}
 #jb{width:112px;height:112px;margin:-56px 0 0 -56px;border:2px solid rgba(255,106,0,.6);background:rgba(255,106,0,.08)}
 #jk{width:50px;height:50px;margin:-25px 0 0 -25px;background:var(--o);box-shadow:0 0 18px rgba(255,106,0,.6)}
-#menu{position:fixed;inset:0;z-index:5;display:flex;align-items:center;padding:0 max(7vw,env(safe-area-inset-left));background:linear-gradient(110deg,rgba(22,17,13,.96) 52%,rgba(22,17,13,.55))}
-#menu:before{content:"";position:absolute;right:-10%;top:0;bottom:0;width:38%;background:linear-gradient(180deg,var(--o),#c24600);clip-path:polygon(32% 0,100% 0,100% 100%,0 100%);opacity:.9;z-index:-1}
-#menu .in{max-width:560px}
+#menu{position:fixed;inset:0;z-index:5;display:flex;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding:max(14px,env(safe-area-inset-top)) max(7vw,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(7vw,env(safe-area-inset-left));background:linear-gradient(110deg,rgba(22,17,13,.96) 52%,rgba(22,17,13,.55))}
+#menu:before{content:"";position:fixed;right:-10%;top:0;bottom:0;width:38%;background:linear-gradient(180deg,var(--o),#c24600);clip-path:polygon(32% 0,100% 0,100% 100%,0 100%);opacity:.9;z-index:-1}
+#menu .in{max-width:560px;margin:auto 0}
+@media (max-height:520px){h1{font-size:36px}.logo svg{width:44px}#msg{margin:8px 0 12px;font-size:14px}#go{padding:11px 34px;font-size:17px}#help{margin-top:12px;font-size:11.5px;line-height:1.4}}
 .logo{display:flex;align-items:center;gap:14px}
 .logo svg{width:clamp(44px,9vw,84px);height:auto;flex:none}
 h1{margin:0;font-size:clamp(38px,9vw,88px);line-height:.95;font-style:italic;font-weight:700;letter-spacing:-.02em}
@@ -83,10 +85,32 @@ h1{margin:0;font-size:clamp(38px,9vw,88px);line-height:.95;font-style:italic;fon
 #pbar{position:absolute;left:50%;bottom:max(128px,calc(env(safe-area-inset-bottom) + 128px));width:210px;height:10px;transform:translateX(-50%);background:rgba(255,255,255,.2);border-radius:6px;overflow:hidden;display:none}
 #pbar i{display:block;height:100%;width:0;background:var(--o)}
 #flash{position:fixed;inset:0;background:#ffd9a8;opacity:0;pointer-events:none;z-index:3}
-#rot{position:fixed;inset:0;z-index:20;display:none;place-items:center;text-align:center;padding:24px;background:var(--bg);font-weight:700;font-size:22px}
+#rot{position:fixed;inset:0;z-index:40;display:none;place-items:center;text-align:center;padding:24px;background:var(--bg);font-weight:700;font-size:22px}
 #rot button{display:block;margin:18px auto 14px;font:inherit;font-weight:700;font-size:20px;color:#1a0e05;background:var(--o);border:0;border-radius:12px;padding:13px 40px}
 #rot small{display:block;font-weight:500;font-size:13px;opacity:.7;max-width:30ch;margin:0 auto}
 @media (orientation:portrait){#rot{display:grid}}
+input{-webkit-user-select:text;user-select:text}   /* typing fields only */
+#acc{position:fixed;top:max(10px,env(safe-area-inset-top));right:max(14px,env(safe-area-inset-right));z-index:6;width:min(250px,44vw);background:var(--chip);border-left:3px solid var(--o);border-radius:10px;padding:8px 10px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+#accl{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-weight:700}
+#accn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#acclv{color:var(--o2);flex:none}
+#accb{height:6px;border-radius:3px;background:rgba(255,255,255,.14);margin:6px 0 4px;overflow:hidden}#accb i{display:block;height:100%;width:0;background:var(--o)}
+#accx{font-size:11px;opacity:.7}
+#accr{display:flex;gap:6px;margin-top:6px}
+#accr button{font:inherit;font-weight:700;font-size:12px;color:var(--ink);background:rgba(255,106,0,.18);border:1px solid rgba(255,106,0,.6);border-radius:8px;padding:6px 8px;flex:1}
+.modal{position:fixed;inset:0;z-index:30;display:none;align-items:center;justify-content:center;background:rgba(22,17,13,.82);padding:10px}
+.modal .panel{width:min(520px,96vw);max-height:94vh;overflow:auto;touch-action:pan-y;background:#1d1611;border:1px solid rgba(255,106,0,.55);border-radius:16px;padding:14px 16px}
+.modal h2{margin:0 0 10px;font-size:20px;font-style:italic}
+.modal input{font:inherit;font-size:16px;width:100%;padding:10px 12px;margin:0 0 8px;border-radius:10px;border:1px solid rgba(255,106,0,.45);background:#271d16;color:var(--ink)}
+.modal .row{display:flex;gap:8px}.modal .row>*{flex:1}
+.pbtn{font:inherit;font-weight:700;color:#1a0e05;background:var(--o);border:0;border-radius:10px;padding:10px 14px}
+.pbtn[disabled]{opacity:.5}
+.gbtn{font:inherit;font-weight:700;color:var(--ink);background:transparent;border:1px solid rgba(255,106,0,.6);border-radius:10px;padding:10px 14px}
+.gbtn.on{background:var(--o);color:#1a0e05}
+#autherr{color:#ff8a6a;font-size:13px;min-height:16px;margin:2px 0 8px}
+.lbr{display:grid;grid-template-columns:38px 1fr auto auto;gap:8px;padding:7px 8px;border-bottom:1px solid rgba(255,255,255,.08);align-items:baseline}
+.lbr.me{background:rgba(255,106,0,.2);border-radius:8px}.lbr .lv{color:var(--o2);font-weight:700}.lbr .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.lbr .vl{opacity:.75;font-size:13px}
+#lbme{margin-top:8px;font-size:13px;opacity:.8}
+#toast{position:fixed;left:50%;top:calc(max(12px,env(safe-area-inset-top)) + 84px);transform:translateX(-50%);z-index:35;opacity:0;pointer-events:none;transition:opacity .25s;font-weight:700;color:var(--o2);text-shadow:0 2px 12px rgba(0,0,0,.8);font-size:18px;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -97,7 +121,7 @@ h1{margin:0;font-size:clamp(38px,9vw,88px);line-height:.95;font-style:italic;fon
 <div class="hud" id="hud" style="display:none">
   <div class="chip" id="hp"><b id="hpn">100</b><small>HP</small><b id="arn" style="font-size:14px;margin-left:10px">0</b><small>AR</small><div class="bar"><i id="hpb"></i></div></div>
   <div class="chip" id="mid"><b id="score">0 : 0</b><small id="rd"></small><small id="tm"></small><small id="alive"></small></div>
-  <div class="chip" id="ks"><b id="kn">0</b><small>kills</small></div>
+  <div class="chip" id="ks"><b id="kn">0</b><small>kills</small><small id="lvc" style="margin-left:8px"></small></div>
   <div class="chip" id="ammo"><small id="wn"></small><b id="am">30</b><small>/ <span id="rs">90</span></small></div>
   <div class="chip" id="obj"></div>
   <canvas id="radar" width="280" height="140"></canvas>
@@ -110,10 +134,27 @@ h1{margin:0;font-size:clamp(38px,9vw,88px);line-height:.95;font-style:italic;fon
   <div class="btn" id="scp">Scope</div>
   <div class="btn" id="rel">Reload</div>
   <div class="btn" id="swp">Swap</div>
+  <div class="btn" id="pick">Pick up</div>
   <div class="btn" id="fire"><svg width="34" height="34" viewBox="0 0 100 100"><path d="M50 10v28M50 62v28M10 50h28M62 50h28" stroke="#1a0e05" stroke-width="10" stroke-linecap="round"/></svg></div>
 </div>
 <div id="shop"><div class="panel"><header><b>Buy menu</b><span id="smoney"></span><button id="ready">Ready</button></header><div id="items"></div></div></div>
-<div id="menu"><div class="in">
+<div id="toast"></div>
+<div class="modal" id="authm"><div class="panel">
+  <h2 id="authh">Sign in</h2>
+  <input id="aname" placeholder="Player name (3-16)" maxlength="16" autocomplete="nickname" style="display:none">
+  <input id="aemail" type="email" placeholder="Email" autocomplete="email">
+  <input id="apass" type="password" placeholder="Password (6+ characters)" autocomplete="current-password">
+  <div id="autherr"></div>
+  <div class="row"><button class="pbtn" id="authgo">Sign in</button><button class="gbtn" id="authsw">Create account</button></div>
+  <div class="row" style="margin-top:8px"><button class="gbtn" id="authx">Close</button></div>
+</div></div>
+<div class="modal" id="lbm"><div class="panel">
+  <h2>Leaderboard</h2>
+  <div class="row" style="margin-bottom:8px"><button class="gbtn on" id="lbt1">Level</button><button class="gbtn" id="lbt2">Kills</button></div>
+  <div id="lbl">Loading...</div><div id="lbme"></div>
+  <div class="row" style="margin-top:10px"><button class="gbtn" id="lbx">Close</button></div>
+</div></div>
+<div id="menu"><div id="acc"><div id="accl"><b id="accn">Guest</b><span id="acclv">Lv 1</span></div><div id="accb"><i id="accbar"></i></div><div id="accx"></div><div id="accr"><button id="accin">Sign in</button><button id="acclb">Leaderboard</button></div></div><div class="in">
   <div class="logo">
     <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="30" fill="none" stroke="#ff6a00" stroke-width="7"/><path d="M50 6v26M50 68v26M6 50h26M68 50h26" stroke="#ff6a00" stroke-width="9" stroke-linecap="round"/></svg>
     <h1>CounterCross</h1>
@@ -121,12 +162,15 @@ h1{margin:0;font-size:clamp(38px,9vw,88px);line-height:.95;font-style:italic;fon
   <p id="msg">Bomb defusal, 10 rounds. You get a random side: Cross plants the C4, Counter defends and defuses.</p>
   <button id="go">Play</button>
   <div id="mstat" style="margin-top:12px;font-size:13px;opacity:.75"></div>
-  <div id="help">Your side (Cross or Counter) is picked at random when you press Play, with 4 bot teammates. Only one Cross player carries the C4: hold Plant inside site A or B for 3 seconds, then protect it for 40 seconds. Counter: stop the plant, or hold Defuse next to the bomb for 5 seconds. A dead player drops their rifle, and the C4 if they carried it, so walk over it to pick it up. You carry one pistol and one rifle, tap Swap to switch. Round 1 is pistols only. Touch: left thumb moves, right side aims, orange button fires (drag it to aim). Light aim assist helps. Best in landscape.<br>Desktop: WASD, mouse, click to fire, right-click scope, R reload, Q swap pistol/rifle, B buy, E hold to plant or defuse, Space jump.</div>
+  <div id="help"><b>Side:</b> random each game. <b>Cross</b> plants the C4 (one player carries it): hold Plant inside site A or B for 3 s. <b>Counter</b> stops the plant, or holds Defuse next to the bomb for 5 s. Dead players drop their rifle, and the C4 if they carried it: walk up and tap Pick up. Swap switches pistol and rifle. Round 1 is pistols only.<br><b>Touch:</b> left thumb moves, right side aims, orange button fires (drag it to aim), light aim assist. Best in landscape. Sign in to save your level and join the leaderboard.<br><b>Desktop:</b> WASD, mouse, click to fire, right-click scope, R reload, Q swap, E plant / defuse / pick up, B buy, Space jump.</div>
 </div></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/utils/SkeletonUtils.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
 const V=THREE.Vector3,R=Math.random,$=id=>document.getElementById(id);
 const cv=$('c'),ren=new THREE.WebGLRenderer({canvas:cv,antialias:true});
@@ -313,7 +357,7 @@ let fid=null,playing=false,firing=false,shopOpen=false,lookX=0,lookY=0,jv={x:0,y
 let bots=[],botMeshes=[];const keys={};
 const rc=new THREE.Raycaster(),sparks=[];
 const wp=()=>WP[P.wk];
-let PT=0;const PRI=['smg','rifle','sniper'];   /* PT: your side, 0 = Cross (plants the C4), 1 = Counter */
+let lastHead=false,PT=0;const PRI=['smg','rifle','sniper'];   /* PT: your side, 0 = Cross (plants the C4), 1 = Counter */
 const alive=t=>bots.filter(b=>!b.dead&&b.team===t).length+(PT===t&&P.alive?1:0);
 const TY={pistol:.09,hc:.14,smg:.145,rifle:.14,sniper:.14},ZF={pistol:62,hc:55,smg:55,rifle:48,sniper:20},SY={pistol:-.08,hc:-.12,smg:-.15,rifle:-.11,sniper:-.12};
 function equip(k,fresh){if(P.wk)P.ammo[P.wk]=[P.am,P.rs];P.wk=k;P.ads=false;P.zm=0;showGun(k);const W=WP[k],a=!fresh&&P.ammo[k];P.am=a?a[0]:W.m;P.rs=a?a[1]:W.res;P.rl=0}
@@ -473,7 +517,7 @@ function pickW(m){m*=.8+R()*.4;return m>=4750&&R()<.25?'sniper':m>=2700?'rifle':
 function hurtBot(b,dmg,byP){if(b.dead)return;if(b.ar>0){dmg*=.6;b.ar-=dmg}b.hp-=dmg;if(b.hp<=0)killBot(b,byP)}
 function killBot(b,byP){
   b.dead=true;b.rotation.x=-Math.PI/2;b.position.y=.3;
-  if(byP){P.kills++;P.money=Math.min(9000,P.money+300)}
+  if(byP){P.kills++;P.money=Math.min(9000,P.money+300);addKillStat();addXP(10+(lastHead?5:0))}
   botMeshes=botMeshes.filter(m=>m.userData.bot!==b);
   dropLoot(b,b.position.x,b.position.z,b.wk);
   setTimeout(()=>scene.remove(b),2500);
@@ -515,7 +559,7 @@ function plantBomb(site,x,z,byP){
   if(B.car&&B.car!==PL)dropPack(B.car);
   Object.assign(B,{ph:'planted',t:40,site,x,z,df:0,bt:0,car:null});B.mesh=mkC4(x,z);
   bots.forEach(b=>{b.wy=null;b.pl=0});
-  if(byP){P.money=Math.min(9000,P.money+300)}P.planting=false;P.pl=0;
+  if(byP){P.money=Math.min(9000,P.money+300);addXP(15)}P.planting=false;P.pl=0;
   banner('Bomb planted at '+site);snd(180,.4,'square',.1);
 }
 /* ---- C4 carrier and dropped items ---- */
@@ -523,11 +567,16 @@ const drops=[];
 function addPack(b){const m=new THREE.Mesh(BG(.34,.14,.22),c4M);m.position.set(0,1.3,-.3);b.body.add(m);b.pack=m}
 function dropPack(b){if(b.pack){b.body.remove(b.pack);b.pack=null}}
 function giveC4(o){const B=G.bomb;B.car=o;if(B.mesh){scene.remove(B.mesh);B.mesh=null}if(o===PL)banner('You picked up the C4');else addPack(o);snd(600,.07,'sine',.06)}
-function dropWeapon(wk,x,z){const g=new THREE.Group(),m=GB[wk].clone(true);m.visible=true;m.rotation.z=Math.PI/2;m.position.y=.14;g.add(m);beacon(g,3);g.position.set(x,0,z);scene.add(g);drops.push({wk,x,z,mesh:g})}
+function dropWeapon(wk,x,z,ammo,lock){const g=new THREE.Group(),m=GB[wk].clone(true);m.visible=true;m.rotation.z=Math.PI/2;m.position.y=.14;g.add(m);beacon(g,3);g.position.set(x,0,z);scene.add(g);drops.push({wk,x,z,mesh:g,ammo,lock:lock||0})}
+function nearDrop(){let best=null,bd=2.2;for(const d of drops){if(d.lock>0||d.wk===P.pri)continue;const q=Math.hypot(P.x-d.x,P.z-d.z);if(q<bd){bd=q;best=d}}return best}
+function takeDrop(d){const i=drops.indexOf(d);if(i<0)return;
+  if(P.pri){const old=P.pri;dropWeapon(old,P.x,P.z,P.wk===old?[P.am,P.rs]:P.ammo[old],1.5)}   /* your old rifle drops at your feet */
+  drops.splice(i,1);scene.remove(d.mesh);P.pri=d.wk;P.ammo[d.wk]=d.ammo||null;equip(d.wk,!d.ammo);banner('Picked up '+WP[d.wk].n);snd(700,.08,'sine',.06)}
+function pickNear(){if(!P.alive)return;const d=nearDrop();if(d)takeDrop(d)}
 function dropLoot(o,x,z,wk){const B=G.bomb;
   if(PRI.includes(wk))dropWeapon(wk,x,z);
   if(B.car===o&&B.ph==='none'){if(o!==PL)dropPack(o);B.car=null;B.mesh=mkC4(x,z,true)}}
-function defuse(){const B=G.bomb;if(B.ph!=='planted')return;B.ph='defused';if(B.mesh)B.mesh.led.material.color.set(0x30ff60);snd(700,.3,'sine',.1);endRound(false,'Bomb defused')}
+function defuse(byP){const B=G.bomb;if(B.ph!=='planted')return;if(byP)addXP(25);B.ph='defused';if(B.mesh)B.mesh.led.material.color.set(0x30ff60);snd(700,.3,'sine',.1);endRound(false,'Bomb defused')}
 function explode(){
   const B=G.bomb;if(B.ph!=='planted')return;B.ph='exploded';
   const bm=new THREE.Mesh(new THREE.SphereGeometry(1,16,12),new THREE.MeshBasicMaterial({color:0xffa040,transparent:true,opacity:.9,blending:THREE.AdditiveBlending,depthWrite:false}));
@@ -598,7 +647,7 @@ function shoot(){
   rc.set(cam.position,dir);rc.far=80;
   const h=rc.intersectObjects(solids.concat(botMeshes)).find(x=>{const u=x.object.userData;return !(u.bot&&u.bot.team===PT)});  /* bullets pass through your own squad */
   if(h){const u=h.object.userData;
-    if(u.bot){const b=u.bot;if(b.team!==PT&&!b.dead){hurtBot(b,W.d*(u.head?2.5:1),true);mark(u.head);snd(u.head?1300:900,.06,'sine',.08)}}
+    if(u.bot){const b=u.bot;if(b.team!==PT&&!b.dead){lastHead=!!u.head;hurtBot(b,W.d*(u.head?2.5:1),true);mark(u.head);snd(u.head?1300:900,.06,'sine',.08)}}
     else spark(h.point);}
   P.pitch+=W.a?.005:.012;P.yaw+=(R()-.5)*.004;P.rec=Math.min(P.rec+1,6);
   snd(P.wk==='sniper'?90:P.wk==='hc'?130:190,.09,'sawtooth',.1);
@@ -664,9 +713,11 @@ function endRound(win,msg){   /* win = Cross won the round */
   if(!win&&G.bomb.ph!=='none')add[0]+=800;   /* Cross planted but lost */
   G.M[0]+=add[0];G.M[1]+=add[1];P.money=Math.min(9000,P.money+add[PT]);G.M=G.M.map(m=>Math.min(9000,m));
   banner(msg||(wt===PT?'Round won':'Round lost'));
+  if(wt===PT)addXP(20);commit();
 }
 function start(){
   PT=R()<.5?0:1;slv.color.set(PT?0x2fa3b5:0xff6a00);   /* random side */
+  matchXP=0;lvStart=lvInfo(PR.xp).l;refreshAcc();
   Object.assign(P,{kills:0,money:800,ar:0,alive:true,lock:false,pri:null,sec:'pistol',ammo:{}});if(FP_ARMS)fpInit();equip('pistol',true);
   Object.assign(G,{round:1,s:[0,0],M:[800,800],L:[0,0]});
   $('menu').style.display='none';$('hud').style.display='block';playing=true;startRound();
@@ -679,9 +730,99 @@ function finish(){
   document.exitPointerLock?.();closeShop();$('dmg').style.opacity=0;$('sc').style.opacity=0;cam.fov=BF;cam.updateProjectionMatrix();
   $('hud').style.display='none';$('menu').style.display='flex';gun.visible=true;
   const a=G.s[PT],e=G.s[1-PT];
-  $('msg').textContent=(a>e?'Victory':a<e?'Defeat':'Draw')+', '+a+' to '+e+'. You finished with '+P.kills+' kills.';
+  addXP(a>e?150:a===e?75:50);PR.matches++;SS.matches++;if(a>e){PR.wins++;SS.wins++}persist();commit();
+  const li=lvInfo(PR.xp).l;
+  $('msg').textContent=(a>e?'Victory':a<e?'Defeat':'Draw')+', '+a+' to '+e+'. You finished with '+P.kills+' kills. +'+matchXP+' XP'+(li>lvStart?', level up! Lv '+li:', Lv '+li)+'.';
   $('go').textContent='Play again';
 }
+
+/* ---------- account, leveling, leaderboard (Firebase) ---------- */
+/* Firebase web config (public values, safe to commit). Empty apiKey = run without accounts. */
+const FIREBASE_CONFIG={apiKey:'AIzaSyBpKFsgmK-CPPBp7e4mGB_U5CFrt_WPez4',authDomain:'countercross-2d823.firebaseapp.com',projectId:'countercross-2d823',
+  storageBucket:'countercross-2d823.firebasestorage.app',messagingSenderId:'899640937876',appId:'1:899640937876:web:04541d3fe19e0893f41381'};
+const PR={name:'Guest',xp:0,kills:0,wins:0,matches:0},SS={xp:0,kills:0,wins:0,matches:0};   /* PR = totals shown, SS = earned but not saved to the server yet */
+let FB_ON=false,fbUser=null,fbAuth=null,fbDb=null,committing=false,matchXP=0,lvStart=1,authMode='in',pendingName='',lbTab='xp';
+const lvNeed=l=>100+60*(l-1);   /* XP to go from level l to l+1 */
+function lvInfo(xp){let l=1;while(l<100&&xp>=lvNeed(l)){xp-=lvNeed(l);l++}return{l,cur:xp,need:l>=100?1:lvNeed(l)}}
+const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const zero=o=>{o.xp=o.kills=o.wins=o.matches=0};
+function loadGuest(){zero(PR);PR.name='Guest';const g=store.get('cc_guest');if(g)Object.assign(PR,{xp:g.xp|0,kills:g.kills|0,wins:g.wins|0,matches:g.matches|0})}
+function persist(){if(fbUser)store.set('cc_pend',Object.assign({uid:fbUser.uid},SS));else store.set('cc_guest',{xp:PR.xp,kills:PR.kills,wins:PR.wins,matches:PR.matches})}
+function toast(t,ms){const e=$('toast');e.textContent=t;e.style.opacity=1;clearTimeout(toast.t);toast.t=setTimeout(()=>{e.style.opacity=0},ms||1200)}
+function refreshAcc(){const i=lvInfo(PR.xp);$('accn').textContent=PR.name;$('acclv').textContent='Lv '+i.l;$('accbar').style.width=(i.l>=100?100:i.cur/i.need*100)+'%';
+  $('accx').textContent=i.l>=100?'Max level':i.cur+' / '+i.need+' XP';$('accin').textContent=fbUser?'Sign out':'Sign in';$('lvc').textContent='Lv '+i.l}
+function addXP(n){const b=lvInfo(PR.xp).l;PR.xp+=n;SS.xp+=n;matchXP+=n;persist();const a=lvInfo(PR.xp).l;refreshAcc();
+  toast(a>b?'LEVEL UP!  Lv '+a:'+'+n+' XP',a>b?2500:900);if(a>b)snd(900,.3,'sine',.08)}
+function addKillStat(){PR.kills++;SS.kills++;persist()}
+/* save what was earned; small chunks so the server rules can cap each write */
+async function commit(){
+  if(!fbUser||!fbDb||committing)return;committing=true;
+  const F=window.firebase.firestore.FieldValue,ref=fbDb.collection('players').doc(fbUser.uid);
+  try{while(SS.xp>0||SS.kills>0||SS.wins>0||SS.matches>0){
+    const dx=Math.min(SS.xp,1000),dk=Math.min(SS.kills,40),dm=Math.min(SS.matches,1),dw=Math.min(SS.wins,1);
+    await ref.update({xp:F.increment(dx),kills:F.increment(dk),matches:F.increment(dm),wins:F.increment(dw),updated:Date.now()});
+    SS.xp-=dx;SS.kills-=dk;SS.matches-=dm;SS.wins-=dw;persist()}}
+  catch(e){}
+  committing=false;
+}
+async function onUser(u){
+  fbUser=u||null;
+  if(!u){zero(SS);loadGuest();refreshAcc();return}
+  PR.name=(pendingName||u.displayName||'Player').slice(0,16);
+  try{
+    const ref=fbDb.collection('players').doc(u.uid);let snap=await ref.get();
+    if(!snap.exists){await ref.set({name:PR.name,xp:0,kills:0,wins:0,matches:0,updated:Date.now()});snap=await ref.get()}
+    const d=snap.data(),p=store.get('cc_pend');zero(SS);if(p&&p.uid===u.uid)Object.assign(SS,{xp:p.xp|0,kills:p.kills|0,wins:p.wins|0,matches:p.matches|0});
+    Object.assign(PR,{name:d.name||PR.name,xp:(d.xp|0)+SS.xp,kills:(d.kills|0)+SS.kills,wins:(d.wins|0)+SS.wins,matches:(d.matches|0)+SS.matches});
+    refreshAcc();commit();
+  }catch(e){refreshAcc();toast('Could not load your profile',2000)}
+}
+function initFB(){
+  const fb=window.firebase;
+  if(!fb||!FIREBASE_CONFIG.apiKey)return;
+  try{fb.initializeApp(FIREBASE_CONFIG);fbAuth=fb.auth();fbDb=fb.firestore();FB_ON=true;fbAuth.onAuthStateChanged(onUser)}catch(e){FB_ON=false}
+}
+const openM=id=>{$(id).style.display='flex'},closeM=id=>{$(id).style.display='none'};
+function authErr(e){const c=(e&&e.code)||'';
+  return c.includes('email-already')?'That email is already registered.':c.includes('invalid-email')?'Enter a valid email.':c.includes('weak-password')?'Password must be 6+ characters.':
+  c.includes('invalid-credential')||c.includes('wrong-password')||c.includes('user-not-found')?'Wrong email or password.':c.includes('network')?'No connection.':
+  c.includes('operation-not-allowed')?'Email sign-in is not enabled yet.':'Could not sign in. Try again.'}
+function setAuthMode(m){authMode=m;const up=m==='up';$('authh').textContent=up?'Create account':'Sign in';$('aname').style.display=up?'block':'none';$('authgo').textContent=up?'Create account':'Sign in';$('authsw').textContent=up?'I have an account':'Create account';$('autherr').textContent=''}
+async function doAuth(){
+  const em=$('aemail').value.trim(),pw=$('apass').value,nm=$('aname').value.trim(),err=$('autherr');err.textContent='';
+  if(authMode==='up'&&!/^[A-Za-z0-9_ ]{3,16}$/.test(nm)){err.textContent='Name: 3-16 letters, numbers, _ or spaces.';return}
+  if(!em||pw.length<6){err.textContent='Enter your email and a 6+ character password.';return}
+  $('authgo').disabled=true;
+  try{
+    if(authMode==='up'){pendingName=nm;const c=await fbAuth.createUserWithEmailAndPassword(em,pw);try{await c.user.updateProfile({displayName:nm})}catch(e){}}
+    else await fbAuth.signInWithEmailAndPassword(em,pw);
+    closeM('authm');$('apass').value=''}
+  catch(e){err.textContent=authErr(e)}
+  $('authgo').disabled=false;
+}
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function openLB(tab){
+  lbTab=tab||lbTab;openM('lbm');const box=$('lbl');
+  $('lbt1').classList.toggle('on',lbTab==='xp');$('lbt2').classList.toggle('on',lbTab==='kills');
+  const i=lvInfo(PR.xp);$('lbme').textContent=fbUser?'You: '+PR.name+', Lv '+i.l+', '+PR.xp+' XP, '+PR.kills+' kills':'Sign in to appear on the leaderboard.';
+  if(!FB_ON){box.textContent='The leaderboard is not available right now.';return}
+  box.textContent='Loading...';
+  try{const sn=await fbDb.collection('players').orderBy(lbTab,'desc').limit(20).get();let h='',n=0;
+    sn.docs.forEach(d=>{const x=d.data(),xp=+x.xp||0;n++;
+      h+='<div class="lbr'+(fbUser&&d.id===fbUser.uid?' me':'')+'"><span>#'+n+'</span><span class="nm">'+esc(String(x.name||'Player').slice(0,16))+'</span><span class="lv">Lv '+lvInfo(xp).l+'</span><span class="vl">'+(lbTab==='xp'?xp+' XP':(+x.kills||0)+' kills')+'</span></div>'});
+    box.innerHTML=h||'No players yet. Be the first!'}
+  catch(e){box.textContent='Could not load the leaderboard.'}
+}
+$('accin').addEventListener('click',()=>{if(!FB_ON){toast('Accounts are not available right now',1800);return}
+  if(fbUser){fbAuth.signOut()}else{setAuthMode('in');openM('authm')}});
+$('acclb').addEventListener('click',()=>openLB());
+$('authgo').addEventListener('click',doAuth);
+$('authsw').addEventListener('click',()=>setAuthMode(authMode==='in'?'up':'in'));
+$('authx').addEventListener('click',()=>closeM('authm'));
+$('lbx').addEventListener('click',()=>closeM('lbm'));
+$('lbt1').addEventListener('click',()=>openLB('xp'));$('lbt2').addEventListener('click',()=>openLB('kills'));
+loadGuest();refreshAcc();
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initFB);else initFB();
 
 function step(dt){
   G.t-=dt;
@@ -704,10 +845,10 @@ function step(dt){
   if(act&&firing&&P.cd<=0&&P.am>0&&!P.rl&&!(P.lock&&!wp().a)){shoot();if(!wp().a)P.lock=true}
   const B=G.bomb;
   if(P.planting&&!canPlant()&&!canDefuse()){P.planting=false;P.pl=0}
-  if(P.planting){P.pl+=dt;if(canPlant()){if(P.pl>=3.2)plantBomb(siteAt(P.x,P.z),P.x,P.z,true)}else if(P.pl>=5){P.planting=false;P.pl=0;defuse()}}
+  if(P.planting){P.pl+=dt;if(canPlant()){if(P.pl>=3.2)plantBomb(siteAt(P.x,P.z),P.x,P.z,true)}else if(P.pl>=5){P.planting=false;P.pl=0;defuse(true)}}
   updBots(dt,G.ph==='live');
-  for(let i=drops.length-1;i>=0;i--){const d=drops[i];d.mesh.rotation.y+=dt*1.5;   /* walk over a better rifle to pick it up */
-    if(P.alive&&G.ph==='live'&&Math.hypot(P.x-d.x,P.z-d.z)<1.6&&(!P.pri||WP[d.wk].p>WP[P.pri].p)){P.pri=d.wk;P.ammo[d.wk]=null;equip(d.wk,true);scene.remove(d.mesh);drops.splice(i,1);banner('Picked up '+WP[P.pri].n);snd(700,.08,'sine',.06)}}
+  for(let i=drops.length-1;i>=0;i--){const d=drops[i];d.mesh.rotation.y+=dt*1.5;if(d.lock>0)d.lock-=dt;   /* walk over a rifle if your slot is empty or it is better; otherwise tap Pick up */
+    if(!d.lock&&P.alive&&G.ph==='live'&&Math.hypot(P.x-d.x,P.z-d.z)<1.6&&(!P.pri||WP[d.wk].p>WP[P.pri].p))takeDrop(d)}
   if(B.ph==='none'&&!B.car&&B.mesh&&G.ph==='live'){const mx=B.mesh.position.x,mz=B.mesh.position.z;   /* walk over the dropped C4 */
     if(PT===0&&P.alive&&Math.hypot(P.x-mx,P.z-mz)<1.5)giveC4(PL);
     else for(const b of bots){if(!b.dead&&!b.team&&Math.hypot(b.position.x-mx,b.position.z-mz)<1.4){giveC4(b);break}}}
@@ -744,6 +885,7 @@ function hud(){
   $('alive').textContent=aa+' v '+ae;
   const B=G.bomb;
   {const pd=canPlant(),dd=!pd&&canDefuse(),pb=$('plant'),tx=dd?'Hold to defuse C4':'Hold to plant C4';pb.style.display=pd||dd?'grid':'none';if(pb.textContent!==tx)pb.textContent=tx}
+  {const nd=P.alive&&G.ph!=='end'?nearDrop():null,pb2=$('pick'),v=nd?'grid':'none';if(pb2.style.display!==v)pb2.style.display=v;if(nd){const tx='Pick up '+WP[nd.wk].n;if(pb2.textContent!==tx)pb2.textContent=tx}}
   {const v=P.pri?'grid':'none',sb=$('swp');if(sb.style.display!==v)sb.style.display=v}
   $('pbar').style.display=P.planting?'block':'none';$('pbar').firstElementChild.style.width=Math.min(100,P.pl/P.need*100)+'%';
   $('obj').textContent=B.ph==='planted'?'BOMB at '+B.site+'   '+Math.ceil(Math.max(0,B.t))+'s'+(B.df>0?'   DEFUSING '+Math.ceil(Math.max(0,5-B.df))+'s':''):PT===0?(B.car===PL?'You carry the C4 - plant it at A or B':B.car?'Escort your C4 carrier':'Pick up the dropped C4'):'Stop the plant at A and B';
@@ -802,7 +944,7 @@ $('fire').addEventListener('pointerdown',e=>{if(e.pointerType!=='touch')firing=t
 ['pointerup','pointercancel'].forEach(n=>$('fire').addEventListener(n,e=>{if(e.pointerType!=='touch')firing=false}));
 bind('rel',reload);
 bind('plant',()=>{if(canPlant()||canDefuse()){P.planting=true;P.pl=0;P.need=canPlant()?3.2:5}},()=>{P.planting=false;P.pl=0});
-bind('swp',swap);
+bind('swp',swap);bind('pick',pickNear);
 bind('scp',()=>{if(P.alive&&G.ph!=='freeze')P.ads=!P.ads});
 const jump=()=>{if(P.y===0&&P.alive&&G.ph!=='freeze')P.vy=7};bind('jmp',jump);
 $('buy').addEventListener('click',openShop);
@@ -810,6 +952,7 @@ $('ready').addEventListener('click',()=>{closeShop();if(G.t>3)G.t=3});
 $('items').addEventListener('click',e=>{const b=e.target.closest('.it');if(b)buy(b.dataset.k)});
 
 addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='KeyR')reload();if(e.code==='KeyB')shopOpen?closeShop():openShop();if(e.code==='Space')jump();if(e.code==='KeyE'&&(canPlant()||canDefuse())){P.planting=true;P.pl=0;P.need=canPlant()?3.2:5}
+  if(e.code==='KeyE'&&!(canPlant()||canDefuse()))pickNear();
   if(e.code==='KeyQ')swap();if(e.code==='Digit1'&&P.alive&&P.pri&&P.wk!==P.pri)equip(P.pri);if(e.code==='Digit2'&&P.alive&&P.wk!==P.sec)equip(P.sec)});
 addEventListener('keyup',e=>{keys[e.code]=false;if(e.code==='KeyE'){P.planting=false;P.pl=0}});
 cv.addEventListener('mousedown',e=>{if(!playing)return;if(e.button===2){if(P.alive&&G.ph!=='freeze')P.ads=!P.ads;return}if(document.pointerLockElement!==cv)cv.requestPointerLock?.();else firing=true});
