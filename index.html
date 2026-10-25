@@ -344,8 +344,8 @@ function skinCounter(sc){
   sc.updateMatrixWorld(true);
   let src=null;sc.traverse(o=>{if(!src&&o.isMesh)src=o});if(!src)throw 0;
   const g=src.geometry.clone();g.applyMatrix4(src.matrixWorld);
-  const N=g.attributes.position.count,P=g.attributes.position.array,si=new Uint16Array(N*4),sw=new Float32Array(N*4),w=new Float32Array(13),ord=[0,1,2,3,4,5,6,7,8,9,10,11,12];
-  for(let i=0;i<N;i++){cWeights(P[i*3],P[i*3+1],w);
+  const pa=g.attributes.position,N=pa.count,si=new Uint16Array(N*4),sw=new Float32Array(N*4),w=new Float32Array(13),ord=[0,1,2,3,4,5,6,7,8,9,10,11,12];
+  for(let i=0;i<N;i++){cWeights(pa.getX(i),pa.getY(i),w);   /* getX/getY: the GLB's vertex data is interleaved */
     const top=ord.slice().sort((a,b)=>w[b]-w[a]);let t=0;for(let k=0;k<4;k++)t+=w[top[k]];
     for(let k=0;k<4;k++){si[i*4+k]=top[k];sw[i*4+k]=w[top[k]]/t}}
   g.applyMatrix4(new THREE.Matrix4().makeScale(.95,.95,.95).premultiply(new THREE.Matrix4().makeTranslation(0,.95,0)));  /* 1.9m tall, feet on y=0 */
