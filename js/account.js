@@ -60,26 +60,40 @@ function applyGate(){
   refreshAcc();updatePlay();
 }
 function authErr(e){const c=(e&&e.code)||'';
-  return c.includes('email-already')?'That email is already registered.':c.includes('invalid-email')?'Enter a valid email.':c.includes('weak-password')?'Password must be 6+ characters.':
-  c.includes('invalid-credential')||c.includes('wrong-password')||c.includes('user-not-found')?'Wrong email or password.':c.includes('network')?'No connection.':
+  return c.includes('email-already')?'That email is already registered.':c.includes('invalid-email')?'Enter a valid email.':c.includes('weak-password')?'Choose a 6-digit security code.':
+  c.includes('invalid-credential')||c.includes('wrong-password')||c.includes('user-not-found')?'Wrong email or security code.':c.includes('network')?'No connection.':
   c.includes('too-many')?'Too many tries. Wait a bit and try again.':c.includes('operation-not-allowed')?'Email sign-in is not enabled yet.':'Could not sign in. Try again.'}
-function setAuthMode(m){authMode=m;const up=m==='up';$('authh').textContent=up?'Create account':'Sign in';$('aname').style.display=up?'block':'none';$('authgo').textContent=up?'Create account':'Sign in';$('authsw').textContent=up?'I have an account':'Create account';$('authfp').style.display=up?'none':'block';$('autherr').textContent=''}
+/* the security code is a 6-digit number used as the password: type it on a number pad, shown as dots */
+function bindPin(id){
+  const inp=$(id),w=inp.parentNode,boxes=()=>w&&w.querySelectorAll?Array.from(w.querySelectorAll('b')):[];
+  const draw=()=>{const v=inp.value;boxes().forEach((b,k)=>{b.textContent=k<v.length?'\u2022':'';b.classList.toggle('on',!!inp._f&&k===Math.min(v.length,5))})};
+  inp.addEventListener('input',()=>{const c=inp.value.replace(/\D/g,'').slice(0,6);if(c!==inp.value)inp.value=c;draw()});
+  inp.addEventListener('focus',()=>{inp._f=true;draw()});inp.addEventListener('blur',()=>{inp._f=false;draw()});
+  inp.draw=draw;
+}
+const clearPins=()=>['apass','apass2'].forEach(id=>{const e=$(id);e.value='';if(e.draw)e.draw()});
+const weakCode=c=>/^(\d)\1{5}$/.test(c)||'0123456789'.includes(c)||'9876543210'.includes(c);
+function setAuthMode(m){authMode=m;const up=m==='up';$('authh').textContent=up?'Create account':'Sign in';$('aname').style.display=up?'block':'none';$('pin2w').style.display=up?'block':'none';
+  $('authgo').textContent=up?'Create account':'Sign in';$('authsw').textContent=up?'Sign in instead':'Create account';$('authfp').style.display=up?'none':'block';
+  $('authnote').textContent=up?'Choose a 6-digit security code. You will use it every time you sign in.':'You need an account to play.';$('autherr').textContent=''}
 async function doAuth(){
-  const em=$('aemail').value.trim(),pw=$('apass').value,nm=$('aname').value.trim(),err=$('autherr');err.textContent='';
+  const em=$('aemail').value.trim(),pw=$('apass').value,pw2=$('apass2').value,nm=$('aname').value.trim(),err=$('autherr');err.textContent='';
   if(authMode==='up'&&!/^[A-Za-z0-9_ ]{3,16}$/.test(nm)){err.textContent='Name: 3-16 letters, numbers, _ or spaces.';return}
-  if(!em||pw.length<6){err.textContent='Enter your email and a 6+ character password.';return}
+  if(!em){err.textContent='Enter your email.';return}
+  if(!/^\d{6}$/.test(pw)){err.textContent='Your security code is 6 digits.';return}
+  if(authMode==='up'){if(pw!==pw2){err.textContent='The two codes do not match.';return}if(weakCode(pw)){err.textContent='Pick a less obvious code (not 123456 or 111111).';return}}
   $('authgo').disabled=true;
   try{
     if(authMode==='up'){pendingName=nm;const c=await fbAuth.createUserWithEmailAndPassword(em,pw);try{await c.user.updateProfile({displayName:nm})}catch(e){}}
     else await fbAuth.signInWithEmailAndPassword(em,pw);
-    $('apass').value=''}
-  catch(e){err.textContent=authErr(e)}
+    clearPins()}
+  catch(e){err.textContent=authErr(e);clearPins()}
   $('authgo').disabled=false;
 }
 async function resetPw(){
   const em=$('aemail').value.trim(),err=$('autherr');
   if(!em){err.textContent='Type your email above first.';return}
-  try{await fbAuth.sendPasswordResetEmail(em);err.textContent='Reset link sent. Check your email.'}catch(e){err.textContent=authErr(e)}
+  try{await fbAuth.sendPasswordResetEmail(em);err.textContent='Link sent. Open it and choose a new 6-digit code.'}catch(e){err.textContent=authErr(e)}
 }
 async function signOutNow(){
   if(!fbUser)return;
@@ -100,6 +114,7 @@ async function openLB(tab){
 }
 $('accin').addEventListener('click',signOutNow);
 $('acclb').addEventListener('click',()=>openLB());
+bindPin('apass');bindPin('apass2');
 $('authgo').addEventListener('click',doAuth);
 $('authfp').addEventListener('click',resetPw);
 $('authsw').addEventListener('click',()=>setAuthMode(authMode==='in'?'up':'in'));
