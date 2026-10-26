@@ -158,6 +158,7 @@ function updatePlay(){
   const b=$('go'),sub=$('gosub'),p=SO.party;let t='Play',dis=false,s='BOMB DEFUSAL \u00b7 5 v 5';
   if(!modelsReady){t='Loading...';dis=true}
   else if(!fbUser){t='Sign in';dis=true}
+  else if(!fbUser.emailVerified){t='Verify email';dis=true}
   else if(p){const n=Object.keys(p.members||{}).length;s='PARTY '+n+'/'+PARTY_MAX;
     if(p.host===myId()){const nr=Object.keys(p.members||{}).filter(id=>id!==p.host&&!(p.members[id]&&p.members[id].r)).length;t='Start';dis=nr>0||p.status==='started';if(nr)s+=' \u00b7 '+nr+' NOT READY'}
     else{const mine=p.members[myId()];t=mine&&mine.r?'Unready':'Ready';dis=p.status==='started'}}

@@ -42,7 +42,7 @@ function endRound(win,msg){   /* win = Cross won the round */
   if(wt===PT)addXP(20,'Rounds won');commit();
 }
 function start(){
-  if(!fbUser||!modelsReady||playing)return;   /* login is required */
+  if(!fbUser||!fbUser.emailVerified||!modelsReady||playing)return;   /* a verified login is required */
   closeM('res');closeM('frm');closeM('invm');
   PT=R()<.5?0:1;slv.color.set(PT?0x2fa3b5:0xff6a00);   /* random side */
   matchXP=0;XB={};lvStart=lvInfo(PR.xp).l;refreshAcc();
