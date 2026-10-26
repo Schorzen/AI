@@ -35,14 +35,26 @@
 </div>
 <div id="shop"><div class="panel"><header><b>Buy menu</b><span id="smoney"></span><button id="ready">Ready</button></header><div id="items"></div></div></div>
 <div id="toast"></div>
+<div id="gate"><div class="gc"><div id="gatet">Checking your account...</div><button class="pbtn" id="gater" style="display:none">Try again</button></div></div>
+<div class="modal" id="frm"><div class="panel">
+  <h2>Friends</h2>
+  <div class="row" style="margin-bottom:8px"><button class="gbtn on" id="frt1">Friends</button><button class="gbtn" id="frt2">Requests</button><button class="gbtn" id="frt3">Add</button></div>
+  <div id="frl"></div>
+  <div class="row" style="margin-top:10px"><button class="gbtn" id="frx">Close</button></div>
+</div></div>
+<div class="modal" id="invm"><div class="panel">
+  <h2>Party invite</h2><div id="invt" style="margin-bottom:12px"></div>
+  <div class="row"><button class="pbtn" id="invj">Join</button><button class="gbtn" id="invd">Decline</button></div>
+</div></div>
 <div class="modal" id="authm"><div class="panel">
   <h2 id="authh">Sign in</h2>
   <input id="aname" placeholder="Player name (3-16)" maxlength="16" autocomplete="nickname" style="display:none">
   <input id="aemail" type="email" placeholder="Email" autocomplete="email">
   <input id="apass" type="password" placeholder="Password (6+ characters)" autocomplete="current-password">
+  <div id="authnote" style="font-size:12px;opacity:.75;margin-bottom:6px">You need an account to play.</div>
   <div id="autherr"></div>
   <div class="row"><button class="pbtn" id="authgo">Sign in</button><button class="gbtn" id="authsw">Create account</button></div>
-  <div class="row" style="margin-top:8px"><button class="gbtn" id="authx">Close</button></div>
+  <div class="row" style="margin-top:8px"><button class="gbtn" id="authfp">Forgot password?</button><button class="gbtn" id="authx" style="display:none">Close</button></div>
 </div></div>
 <div class="modal" id="lbm"><div class="panel">
   <h2>Leaderboard</h2>
@@ -51,13 +63,14 @@
   <div class="row" style="margin-top:10px"><button class="gbtn" id="lbx">Close</button></div>
 </div></div>
 <div id="menu">
-  <div id="tr"><button class="ib" id="acclb"><svg viewBox="0 0 24 24"><path d="M7 4h10v4a5 5 0 0 1-10 0V4zM5 5H3v2a3 3 0 0 0 3 3M19 5h2v2a3 3 0 0 1-3 3M12 13v4M8 21h8M10 17h4"/></svg><span>Leaderboard</span></button><button class="ib" id="accin"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg><span id="accint">Sign in</span></button></div>
+  <div id="tr"><button class="ib" id="acclb"><svg viewBox="0 0 24 24"><path d="M7 4h10v4a5 5 0 0 1-10 0V4zM5 5H3v2a3 3 0 0 0 3 3M19 5h2v2a3 3 0 0 1-3 3M12 13v4M8 21h8M10 17h4"/></svg><span>Leaderboard</span></button><button class="ib" id="frb"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M16 4.8a3.5 3.5 0 0 1 0 6.4M18 14.4c2.2.7 3.5 2.6 3.5 5.6"/></svg><span>Friends</span><i class="bd" id="frbd" style="display:none"></i></button><button class="ib" id="accin"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg><span id="accint">Sign in</span></button></div>
   <div id="lcol"><div id="pf"><div id="av">G</div><div class="pi"><b id="accn">Guest</b><div class="pl"><span id="acclv">Lv 1</span><div id="accb"><i id="accbar"></i></div></div><small id="accx"></small><small id="accs"></small></div></div>
   <div id="lc"><button class="ib" id="helpb"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h.01"/></svg><span>How to play</span></button></div></div>
   <div id="hero"><div class="logo">
     <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="30" fill="none" stroke="#ff6a00" stroke-width="7"/><path d="M50 6v26M50 68v26M6 50h26M68 50h26" stroke="#ff6a00" stroke-width="9" stroke-linecap="round"/></svg>
     <h1>CounterCross</h1>
   </div><p id="msg">Bomb defusal &middot; 10 rounds &middot; random side</p><div id="mstat"></div></div>
+  <div id="party"><div id="ptyslots"></div><div id="ptyinfo" style="display:none"><span>Party code <b id="ptycode"></b></span><button class="mini" id="ptyleave">Leave</button></div></div>
   <div id="goW"><small id="gosub">BOMB DEFUSAL &middot; 5 v 5</small><button id="go">Play</button></div>
 </div>
 <div class="modal" id="helpm"><div class="panel"><h2>How to play</h2><div id="help"><b>Side:</b> random each game. <b>Cross</b> plants the C4 (one player carries it): hold Plant inside site A or B for 3 s. <b>Counter</b> stops the plant, or holds Defuse next to the bomb for 5 s. Dead players drop their rifle, and the C4 if they carried it: walk up and tap Pick up. Swap switches pistol and rifle. Round 1 is pistols only.<br><b>Touch:</b> left thumb moves, right side aims, orange button fires (drag it to aim), light aim assist. Best in landscape. Sign in to save your level and join the leaderboard.<br><b>Desktop:</b> WASD, mouse, click to fire, right-click scope, R reload, Q swap, E plant / defuse / pick up, B buy, Space jump.</div><div class="row" style="margin-top:10px"><button class="gbtn" id="helpx">Close</button></div></div></div>
@@ -78,6 +91,7 @@
 <script src="js/config.js?v=1"></script>
 <script src="js/util.js?v=1"></script>
 <script src="js/account.js?v=1"></script>
+<script src="js/social.js?v=1"></script>
 <script src="js/core.js?v=1"></script>
 <script src="js/world.js?v=1"></script>
 <script src="js/weapons.js?v=1"></script>
