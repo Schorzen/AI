@@ -1,6 +1,6 @@
 /* Touch, mouse and keyboard controls and on-screen buttons. */
 /* ---------- input ---------- */
-$('go').addEventListener('click',start);
+$('go').addEventListener('click',onPlay);
 $('helpb').addEventListener('click',()=>openM('helpm'));$('helpx').addEventListener('click',()=>closeM('helpm'));$('resc').addEventListener('click',()=>closeM('res'));
 $('rotb').addEventListener('click',async()=>{try{await document.documentElement.requestFullscreen?.()}catch(e){}try{await screen.orientation?.lock?.('landscape')}catch(e){}});
 const jb=$('jb'),jk=$('jk');

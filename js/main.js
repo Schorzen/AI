@@ -62,3 +62,5 @@ let last=performance.now();
   sky.position.copy(cam.position);
   ren.render(scene,cam);
 })(last);
+/* start the login service once every file above has loaded */
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initFB);else initFB();

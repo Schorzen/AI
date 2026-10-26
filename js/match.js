@@ -42,6 +42,8 @@ function endRound(win,msg){   /* win = Cross won the round */
   if(wt===PT)addXP(20,'Rounds won');commit();
 }
 function start(){
+  if(!fbUser||!modelsReady||playing)return;   /* login is required */
+  closeM('res');closeM('frm');closeM('invm');
   PT=R()<.5?0:1;slv.color.set(PT?0x2fa3b5:0xff6a00);   /* random side */
   matchXP=0;XB={};lvStart=lvInfo(PR.xp).l;refreshAcc();
   Object.assign(P,{kills:0,money:800,ar:0,alive:true,lock:false,pri:null,sec:'pistol',ammo:{}});if(FP_ARMS)fpInit();equip('pistol',true);
@@ -54,7 +56,7 @@ function start(){
 function finish(){
   playing=false;firing=false;fid=lid=jid=null;jv={x:0,y:0};jb.style.display=jk.style.display='none';
   document.exitPointerLock?.();closeShop();$('dmg').style.opacity=0;$('sc').style.opacity=0;cam.fov=BF;cam.updateProjectionMatrix();
-  $('hud').style.display='none';$('menu').style.display='flex';gun.visible=true;
+  $('hud').style.display='none';$('menu').style.display='flex';gun.visible=true;partyReopen();if(SO.inv.length)showInvite();
   const a=G.s[PT],e=G.s[1-PT];
   addXP(50,'Match played',1);if(a>e)addXP(100,'Victory bonus',1);else if(a===e)addXP(25,'Draw bonus',1);
   PR.matches++;SS.matches++;if(a>e){PR.wins++;SS.wins++}persist();commit();

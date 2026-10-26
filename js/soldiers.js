@@ -54,8 +54,8 @@ function prepModel(k,sc){
     m.metalness=.1;m.roughness=.85;if(m.emissive)m.emissive.setRGB(.1,.08,.07);m.color.set(k==='cross'?0xffe0c8:0xc8e4ff)})}});
   MODELS[k]=sc;
 }
-{const go2=$('go');go2.disabled=true;go2.textContent='Loading soldiers...';let n=2,fin=false;
- const done=()=>{if(fin)return;fin=true;go2.disabled=false;go2.textContent='Play';
+{let n=2,fin=false;
+ const done=()=>{if(fin)return;fin=true;modelsReady=true;updatePlay();
    $('mstat').textContent=!THREE.GLTFLoader||!THREE.SkeletonUtils?'3D soldier loader was blocked, using blocky soldiers.':MODELS.cross&&MODELS.counter?'3D soldiers loaded.':MODELS.cross||MODELS.counter?'Only one 3D soldier file was found in the assets folder.':'3D soldier files not found. Upload soldier_cross.glb and soldier_counter.glb next to index.html. Using blocky soldiers for now.'};
  if(!THREE.GLTFLoader||!THREE.SkeletonUtils)done();
  else{const L=new THREE.GLTFLoader();
