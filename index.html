@@ -52,13 +52,23 @@
     <h2 id="authh">Sign in</h2>
     <input id="aname" placeholder="Player name (3-16)" maxlength="16" autocomplete="nickname" style="display:none">
     <input id="aemail" type="email" placeholder="Email" autocomplete="email">
-    <label class="al" for="apass">Security code (6 digits)</label>
-    <div class="pin"><b></b><b></b><b></b><b></b><b></b><b></b><input id="apass" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" aria-label="6-digit security code"></div>
-    <div id="pin2w" style="display:none"><label class="al" for="apass2">Confirm security code</label><div class="pin"><b></b><b></b><b></b><b></b><b></b><b></b><input id="apass2" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" aria-label="6-digit security code"></div></div>
+    <input id="apass" type="password" placeholder="Password (6+ characters)" autocomplete="current-password">
     <div id="authnote">You need an account to play.</div>
     <div id="autherr"></div>
     <div class="row"><button class="pbtn" id="authgo">Sign in</button><button class="gbtn" id="authsw">Create account</button></div>
-    <button class="lnk" id="authfp">Forgot code?</button>
+    <button class="lnk" id="authfp">Forgot password?</button>
+  </div>
+</div></div>
+<div class="modal full" id="verm"><div class="aw">
+  <div class="ab"><div class="logo"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="30" fill="none" stroke="#ff6a00" stroke-width="7"/><path d="M50 6v26M50 68v26M6 50h26M68 50h26" stroke="#ff6a00" stroke-width="9" stroke-linecap="round"/></svg><h1>CounterCross</h1></div><p>One last step: confirm your email.</p></div>
+  <div class="ac">
+    <h2>Verify your email</h2>
+    <div id="vertxt" style="font-size:13px;opacity:.85"></div>
+    <div id="vermail" style="font-weight:700;margin:2px 0 8px;overflow-wrap:anywhere"></div>
+    <div class="fe">Open the link in that email, then come back here. Check your spam folder too.</div>
+    <div id="vermsg"></div>
+    <div class="row"><button class="pbtn" id="verok">I have verified</button><button class="gbtn" id="verre">Resend email</button></div>
+    <button class="lnk" id="verso">Sign out</button>
   </div>
 </div></div>
 <div class="modal" id="lbm"><div class="panel">
