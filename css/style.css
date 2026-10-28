@@ -150,3 +150,5 @@ h1{margin:0;font-size:clamp(30px,6vw,64px);line-height:.95;font-style:italic;fon
 @media (max-height:420px){.ac{padding:10px 14px}.ac h2{font-size:17px;margin-bottom:4px}.modal .ac input{padding:7px 10px;margin-bottom:6px}.ab .logo svg{width:34px}.ab h1{font-size:30px}.ab p{font-size:12px}}
 @media (max-width:700px){.ab{display:none}.ac{width:min(420px,90vw)}}
 #vermsg{color:#ffb86b;font-size:13px;min-height:16px;margin:6px 0}
+#dlv{left:max(14px,env(safe-area-inset-left));top:calc(max(12px,env(safe-area-inset-top)) + 108px);width:auto;height:auto;padding:8px 12px;border-radius:10px;font-size:12px;background:var(--chip);border:1px solid rgba(255,255,255,.3)}
+.mini:disabled{opacity:.6}
