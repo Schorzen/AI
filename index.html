@@ -25,6 +25,7 @@
   <div id="pbar"><i></i></div>
   <div class="chip" id="cash">$800</div>
   <div class="btn" id="buy">Buy</div>
+  <div class="btn" id="dlv" style="display:none">Leave</div>
   <div id="xh"></div>
   <div class="btn" id="jmp">Jump</div>
   <div class="btn" id="scp">Scope</div>
@@ -85,7 +86,7 @@
     <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="30" fill="none" stroke="#ff6a00" stroke-width="7"/><path d="M50 6v26M50 68v26M6 50h26M68 50h26" stroke="#ff6a00" stroke-width="9" stroke-linecap="round"/></svg>
     <h1>CounterCross</h1>
   </div><p id="msg">Bomb defusal &middot; 10 rounds &middot; random side</p><div id="mstat"></div></div>
-  <div id="party"><div id="ptyslots"></div><div id="ptyinfo" style="display:none"><span>Party code <b id="ptycode"></b></span><button class="mini" id="ptyleave">Leave</button></div></div>
+  <div id="party"><div id="ptyslots"></div><div id="ptyinfo" style="display:none"><span>Party code <b id="ptycode"></b></span><button class="mini" id="ptymode">Vs bots</button><button class="mini" id="ptyleave">Leave</button></div></div>
   <div id="goW"><small id="gosub">BOMB DEFUSAL &middot; 5 v 5</small><button id="go">Play</button></div>
 </div>
 <div class="modal" id="helpm"><div class="panel"><h2>How to play</h2><div id="help"><b>Side:</b> random each game. <b>Cross</b> plants the C4 (one player carries it): hold Plant inside site A or B for 3 s. <b>Counter</b> stops the plant, or holds Defuse next to the bomb for 5 s. Dead players drop their rifle, and the C4 if they carried it: walk up and tap Pick up. Swap switches pistol and rifle. Round 1 is pistols only.<br><b>Touch:</b> left thumb moves, right side aims, orange button fires (drag it to aim), light aim assist. Best in landscape. Sign in to save your level and join the leaderboard.<br><b>Desktop:</b> WASD, mouse, click to fire, right-click scope, R reload, Q swap, E plant / defuse / pick up, B buy, Space jump.</div><div class="row" style="margin-top:10px"><button class="gbtn" id="helpx">Close</button></div></div></div>
@@ -102,6 +103,7 @@
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <!-- game code: load order matters (see README.md) -->
 <script src="js/config.js?v=1"></script>
 <script src="js/util.js?v=1"></script>
@@ -116,6 +118,7 @@
 <script src="js/ai.js?v=1"></script>
 <script src="js/player.js?v=1"></script>
 <script src="js/match.js?v=1"></script>
+<script src="js/duel.js?v=1"></script>
 <script src="js/hud.js?v=1"></script>
 <script src="js/input.js?v=1"></script>
 <script src="js/main.js?v=1"></script>
