@@ -89,7 +89,7 @@ function onFriendClick(act,id){
 const meEntry=r=>({n:PR.name,l:lvInfo(PR.xp).l,r});
 async function ensureParty(){
   if(SO.party)return true;
-  try{const ref=col('lobbies').doc(),d={host:myId(),code:randCode(5),status:'open',members:{[myId()]:meEntry(true)},invited:[],created:Date.now(),seen:Date.now()};
+  try{const ref=col('lobbies').doc(),d={host:myId(),code:randCode(5),status:'open',mode:'bots',members:{[myId()]:meEntry(true)},invited:[],created:Date.now(),seen:Date.now()};
     await ref.set(d);SO.party=Object.assign({id:ref.id},d);SO.lastStatus='open';watchParty(ref.id);renderParty();updatePlay();return true}
   catch(e){toast('Could not create a party',1800);return false}
 }
@@ -105,7 +105,11 @@ function watchParty(id){
     if(d.status==='open'&&prev==='started'&&myId()!==d.host&&d.members[myId()].r)setReady(false);
     renderParty();renderFriends();updatePlay()},()=>{});
 }
-function startFromParty(){if(playing||!modelsReady)return;start()}
+function startFromParty(){const p=SO.party;if(playing||!modelsReady)return;if(p&&p.mode==='duel')startDuel(p);else start()}
+async function setMode(){const p=SO.party;if(!p||p.host!==myId())return;const to=p.mode==='duel'?'bots':'duel';
+  if(to==='duel'&&!fbRtdb)return toast('Duels are not set up yet',2000);
+  if(to==='duel'&&Object.keys(p.members||{}).length>2)return toast('A duel is 1v1: only 2 players can be in the party',2500);
+  try{await col('lobbies').doc(p.id).update({mode:to})}catch(e){toast('Could not change the mode',1500)}}
 async function inviteFriend(uid){
   if(!await ensureParty())return;
   if(Object.keys(SO.party.members||{}).length>=PARTY_MAX)return toast('The party is full',1500);
@@ -149,7 +153,8 @@ function renderParty(){
   else{const ids=Object.keys(p.members||{}).sort((a,b)=>(b===p.host)-(a===p.host));
     ids.forEach(id=>{const m=p.members[id],rdy=id===p.host||m.r;h+=slotH(m.n,+m.l||1,(id===me?'me ':'')+(rdy?'rdy':''),id===p.host?'Host':m.r?'Ready':'')});
     for(let i=ids.length;i<PARTY_MAX;i++)h+=emptySlot;
-    $('ptycode').textContent=p.code;$('ptyinfo').style.display='flex'}
+    $('ptycode').textContent=p.code;$('ptyinfo').style.display='flex';
+    const md=$('ptymode');md.textContent=p.mode==='duel'?'Duel 1v1':'Vs bots';md.disabled=p.host!==me}
   box.innerHTML=h;
 }
 /* ---- the big Play button doubles as Start / Ready in a party ---- */
@@ -160,8 +165,9 @@ function updatePlay(){
   else if(!fbUser){t='Sign in';dis=true}
   else if(!fbUser.emailVerified){t='Verify email';dis=true}
   else if(p){const n=Object.keys(p.members||{}).length;s='PARTY '+n+'/'+PARTY_MAX;
-    if(p.host===myId()){const nr=Object.keys(p.members||{}).filter(id=>id!==p.host&&!(p.members[id]&&p.members[id].r)).length;t='Start';dis=nr>0||p.status==='started';if(nr)s+=' \u00b7 '+nr+' NOT READY'}
-    else{const mine=p.members[myId()];t=mine&&mine.r?'Unready':'Ready';dis=p.status==='started'}}
+    if(p.host===myId()){const nr=Object.keys(p.members||{}).filter(id=>id!==p.host&&!(p.members[id]&&p.members[id].r)).length;t='Start';dis=nr>0||p.status==='started';if(nr)s+=' \u00b7 '+nr+' NOT READY';
+      if(p.mode==='duel'){s='DUEL 1v1 \u00b7 '+n+'/2';if(!fbRtdb){dis=true;s='DUELS NOT SET UP'}else if(n!==2){dis=true;s='DUEL NEEDS 2 PLAYERS'}else if(nr)s+=' \u00b7 NOT READY'}}
+    else{const mine=p.members[myId()];t=mine&&mine.r?'Unready':'Ready';dis=p.status==='started';if(p.mode==='duel')s='DUEL 1v1 \u00b7 '+n+'/2'}}
   b.textContent=t;b.disabled=dis;sub.textContent=s;
 }
 function onPlay(){
@@ -176,7 +182,7 @@ $('frx').addEventListener('click',()=>closeM('frm'));
 [['frt1','friends'],['frt2','req'],['frt3','add']].forEach(a=>$(a[0]).addEventListener('click',()=>{SO.tab=a[1];renderFriends(true)}));
 $('frl').addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act]');if(b)onFriendClick(b.dataset.act,b.dataset.id)});
 $('ptyslots').addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act]');if(b&&fbUser)openFriends('friends')});
-$('ptyleave').addEventListener('click',leaveParty);
+$('ptyleave').addEventListener('click',leaveParty);$('ptymode').addEventListener('click',setMode);
 $('invj').addEventListener('click',()=>{if(SO.curInv)joinParty(SO.curInv)});
 $('invd').addEventListener('click',()=>{if(SO.curInv)SO.dismiss.add(SO.curInv);closeM('invm');SO.inv=SO.inv.filter(x=>x.id!==SO.curInv);badges();if(SO.inv.length)setTimeout(showInvite,300)});
 renderParty();updatePlay();

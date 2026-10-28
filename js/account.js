@@ -1,6 +1,6 @@
 /* Accounts (login is required), XP and levels, leaderboard (Firebase Auth + Firestore). */
 const PR={name:'',code:'',xp:0,kills:0,wins:0,matches:0},SS={xp:0,kills:0,wins:0,matches:0};   /* PR = totals shown, SS = earned but not saved to the server yet */
-let FB_ON=false,initFailed=false,authReady=false,fbUser=null,fbAuth=null,fbDb=null,committing=false,matchXP=0,lvStart=1,authMode='in',pendingName='',lbTab='xp';
+let fbRtdb=null,FB_ON=false,initFailed=false,authReady=false,fbUser=null,fbAuth=null,fbDb=null,committing=false,matchXP=0,lvStart=1,authMode='in',pendingName='',lbTab='xp';
 let verAt=0,verSent=false,verTimer=null,loadedUid=null;   /* email verification state */
 const lvNeed=l=>100+60*(l-1);   /* XP to go from level l to l+1 */
 function lvInfo(xp){let l=1;while(l<100&&xp>=lvNeed(l)){xp-=lvNeed(l);l++}return{l,cur:xp,need:l>=100?1:lvNeed(l)}}
@@ -52,7 +52,7 @@ async function loadProfile(u){
 function initFB(){
   const fb=window.firebase;
   if(!fb||!FIREBASE_CONFIG.apiKey){initFailed=true;applyGate();return}
-  try{fb.initializeApp(FIREBASE_CONFIG);fbAuth=fb.auth();fbDb=fb.firestore();FB_ON=true;fbAuth.onAuthStateChanged(onUser)}catch(e){FB_ON=false;initFailed=true}
+  try{fb.initializeApp(FIREBASE_CONFIG);fbAuth=fb.auth();fbDb=fb.firestore();if(FIREBASE_CONFIG.databaseURL&&fb.database)fbRtdb=fb.database();FB_ON=true;fbAuth.onAuthStateChanged(onUser)}catch(e){FB_ON=false;initFailed=true}
   applyGate();
 }
 /* login is required: until you are signed in the lobby is covered and Play is off */

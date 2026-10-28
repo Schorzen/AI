@@ -4,19 +4,20 @@ function hud(){
   $('hpn').textContent=Math.max(0,Math.ceil(P.hp));$('hpb').style.width=Math.max(0,P.hp)+'%';$('arn').textContent=Math.ceil(P.ar);
   $('cash').textContent='$'+P.money;$('kn').textContent=P.kills;
   $('am').textContent=P.rl?'...':P.am;$('rs').textContent=P.rs;$('wn').textContent=wp().n;
-  $('score').textContent=G.s[PT]+' : '+G.s[1-PT];$('rd').textContent='R'+G.round+'/10';
-  const t=Math.max(0,Math.ceil(G.t));$('tm').textContent=G.ph==='freeze'?'Buy '+t:G.ph==='live'?(G.bomb.ph==='planted'?'C4 armed':Math.floor(t/60)+':'+String(t%60).padStart(2,'0')):'';
-  $('alive').textContent=aa+' v '+ae;
+  $('score').textContent=G.s[PT]+' : '+G.s[1-PT];$('rd').textContent=DUEL.on?'Duel R'+G.round:'R'+G.round+'/10';
+  const t=Math.max(0,Math.ceil(G.t));$('tm').textContent=G.ph==='freeze'?(DUEL.on?'Get ready ':'Buy ')+t:G.ph==='live'?(G.bomb.ph==='planted'?'C4 armed':Math.floor(t/60)+':'+String(t%60).padStart(2,'0')):'';
+  $('alive').textContent=DUEL.on?'First to '+DUEL_WIN:aa+' v '+ae;$('cash').style.display=DUEL.on?'none':'';
   const B=G.bomb;
   {const pd=canPlant(),dd=!pd&&canDefuse(),pb=$('plant'),tx=dd?'Hold to defuse C4':'Hold to plant C4';pb.style.display=pd||dd?'grid':'none';if(pb.textContent!==tx)pb.textContent=tx}
   {const nd=P.alive&&G.ph!=='end'?nearDrop():null,pb2=$('pick'),v=nd?'grid':'none';if(pb2.style.display!==v)pb2.style.display=v;if(nd){const tx='Pick up '+WP[nd.wk].n;if(pb2.textContent!==tx)pb2.textContent=tx}}
   {const v=P.pri?'grid':'none',sb=$('swp');if(sb.style.display!==v)sb.style.display=v}
   $('pbar').style.display=P.planting?'block':'none';$('pbar').firstElementChild.style.width=Math.min(100,P.pl/P.need*100)+'%';
   $('obj').textContent=B.ph==='planted'?'BOMB at '+B.site+'   '+Math.ceil(Math.max(0,B.t))+'s'+(B.df>0?'   DEFUSING '+Math.ceil(Math.max(0,5-B.df))+'s':''):PT===0?(B.car===PL?'You carry the C4 - plant it at A or B':B.car?'Escort your C4 carrier':'Pick up the dropped C4'):'Stop the plant at A and B';
+  if(DUEL.on)$('obj').textContent='1v1: eliminate your friend';
   $('obj').classList.toggle('hot',B.ph==='planted');
   drawRadar();
   $('scp').classList.toggle('on',P.ads);
-  $('buy').style.display=G.ph==='freeze'&&!shopOpen?'grid':'none';
+  $('buy').style.display=G.ph==='freeze'&&!shopOpen&&!DUEL.on?'grid':'none';
   $('dmg').style.opacity=P.dmg;
 }
 

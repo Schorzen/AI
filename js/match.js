@@ -53,10 +53,11 @@ function start(){
   try{screen.orientation?.lock?.('landscape').catch(()=>{})}catch(e){}
   snd(400,.1,'sine',.05);
 }
-function finish(){
+function finish(forfeit){
   playing=false;firing=false;fid=lid=jid=null;jv={x:0,y:0};jb.style.display=jk.style.display='none';
   document.exitPointerLock?.();closeShop();$('dmg').style.opacity=0;$('sc').style.opacity=0;cam.fov=BF;cam.updateProjectionMatrix();
   $('hud').style.display='none';$('menu').style.display='flex';gun.visible=true;partyReopen();if(SO.inv.length)showInvite();
+  if(forfeit){if(forfeit!=='quiet')toast('You left the match',1800);return}   /* leaving early: no result, no XP */
   const a=G.s[PT],e=G.s[1-PT];
   addXP(50,'Match played',1);if(a>e)addXP(100,'Victory bonus',1);else if(a===e)addXP(25,'Draw bonus',1);
   PR.matches++;SS.matches++;if(a>e){PR.wins++;SS.wins++}persist();commit();

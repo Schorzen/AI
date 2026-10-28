@@ -59,7 +59,7 @@ function takeDrop(d){const i=drops.indexOf(d);if(i<0)return;
   if(P.pri){const old=P.pri;dropWeapon(old,P.x,P.z,P.wk===old?[P.am,P.rs]:P.ammo[old],1.5)}   /* your old rifle drops at your feet */
   drops.splice(i,1);scene.remove(d.mesh);P.pri=d.wk;P.ammo[d.wk]=d.ammo||null;equip(d.wk,!d.ammo);banner('Picked up '+WP[d.wk].n);snd(700,.08,'sine',.06)}
 function pickNear(){if(!P.alive)return;const d=nearDrop();if(d)takeDrop(d)}
-function dropLoot(o,x,z,wk){const B=G.bomb;
+function dropLoot(o,x,z,wk){if(DUEL.on)return;const B=G.bomb;
   if(PRI.includes(wk))dropWeapon(wk,x,z);
   if(B.car===o&&B.ph==='none'){if(o!==PL)dropPack(o);B.car=null;B.mesh=mkC4(x,z,true)}}
 function defuse(byP){const B=G.bomb;if(B.ph!=='planted')return;if(byP)addXP(25,'Objectives');B.ph='defused';if(B.mesh)B.mesh.led.material.color.set(0x30ff60);snd(700,.3,'sine',.1);endRound(false,'Bomb defused')}
